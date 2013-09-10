@@ -1,0 +1,136 @@
+/*
+ * Author:  Luca Carlon
+ * Company: -
+ * Date:    05.12.2011
+ *
+ * Copyright (c) 2013 Luca Carlon. All rights reserved.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ */
+
+/*------------------------------------------------------------------------------
+ |    includes
+ +-----------------------------------------------------------------------------*/
+#ifndef __ANDROID__
+#include <QCoreApplication>
+#include <QElapsedTimer>
+#endif
+
+#include "lc_logging.h"
+
+#ifdef __ANDROID__
+#include <jni.h>
+
+extern "C" void Java_com_luke_android_lightloggerandroid_MainActivity_log(JNIEnv* env, jobject obj)
+{
+   log_debug_t("LightLoggerAndroid", "Done! ;-)");
+   log_warn_t("LightLoggerAndroid", "Warn log! ;-)");
+}
+#endif
+
+#ifndef __ANDROID__
+/*------------------------------------------------------------------------------
+ |    test_func2
+ +-----------------------------------------------------------------------------*/
+void test_func2(int i)
+{
+   (void)i;
+
+   log_stacktrace(LC_LOG_INFO, 90);
+}
+
+/*------------------------------------------------------------------------------
+ |    test_func
+ +-----------------------------------------------------------------------------*/
+void test_func()
+{
+   test_func2(1);
+}
+#endif
+
+#ifndef __ANDROID__
+/*------------------------------------------------------------------------------
+ |    main
+ +-----------------------------------------------------------------------------*/
+int main(int /* argc */, char** /* argv */)
+{
+#if 0
+   QElapsedTimer timer;
+   timer.start();
+
+   // Test with lc_logging.
+   for (int i = 0; i < 100000; i++)
+      log_verbose("Test: %d.", i);
+   qDebug("Result lc_logging: %lld.", timer.elapsed());
+
+   // Test with printf.
+   timer.restart();
+   for (int i = 0; i < 100000; i++) {
+      fprintf(stdout, "- DEBUG:%s: Test: %d.\n", lc_current_time().c_str(), i);
+      fflush(stdout);
+   }
+   qDebug("Result printf: %lld.", timer.elapsed());
+
+   // Test with qDebug.
+   timer.restart();
+   for (int i = 0; i < 100000; i++) {
+      qDebug("- DEBUG:%s: Test: %d.\n", lc_current_time().c_str(), i);
+      fflush(stderr);
+   }
+   qDebug("Result qDebug: %lld.", timer.elapsed());
+#endif
+
+#ifdef __GNUC__
+   LOG_CRITICAL("MyTag", "Oooops!");
+#endif
+
+   log_debug("Some message for debugging...");
+
+   log_critical("Print int: %d.", 5);
+   log_critical_t("MyTag", "Print int: %d.", 5);
+   log_critical_t("MyTag", "Print with tag only.");
+
+   /*lc_formatted_printf(stdout, LC_LOG_ATTR_UNDERLINE, LC_LOG_COL_MAGENTA,
+                     "Underlined %s! ;-)\n", "magenta");*/
+   log_formatted(LC_LOG_ATTR_UNDERLINE, LC_LOG_COL_YELLOW, "Formatted text.");
+   log_formatted(LC_LOG_COL_YELLOW, "Formatted text with %s.", "param");
+
+#ifndef __ANDROID__
+   test_func();
+#endif
+
+   // Using streams.
+   {
+      LC_LogDef logger(NULL, LC_LOG_ATTR_RESET, LC_LOG_COL_BLUE);
+      logger.stream() << "Blue log using stream. " << "Params can be added like " << 1234 << ".";
+
+      LC_LogDef l(NULL);
+      Q_UNUSED(l);
+   }
+
+   {
+      LC_Log<LC_Output2Std> logger(LC_LOG_DEBUG);
+      logger.stream() << "Debug log with stream.";
+   }
+
+   {
+      LC_Log<LC_Output2Std> logger(LC_LOG_WARN);
+      logger.stream() << "Warning log with stream.";
+   }
+
+   {
+      LC_Log<LC_Output2Std> logger(LC_LOG_CRITICAL);
+      logger.stream() << "Critical log with stream.";
+   }
+
+   return 0;
+}
+#endif
