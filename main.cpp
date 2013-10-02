@@ -101,7 +101,6 @@ int main(int /* argc */, char** /* argv */)
    qDebug("Result qDebug: %lld.", timer.elapsed());
 #endif
 
-#if 0
 #ifdef __GNUC__
    LOG_CRITICAL("MyTag", "Oooops!");
 #endif
@@ -146,7 +145,5 @@ int main(int /* argc */, char** /* argv */)
    }
 
    return 0;
-#endif
-   return 4;
 }
 #endif
