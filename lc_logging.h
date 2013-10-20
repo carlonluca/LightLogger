@@ -279,7 +279,7 @@ inline bool log_info(const char* format, ...);
 // TODO: Some more functions might be needed!
 inline bool log_formatted_t_v(const char* log_tag, LC_LogAttrib a, LC_LogColor c, const char* format, va_list args);
 inline bool log_formatted_t(const char* log_tag, LC_LogAttrib a, LC_LogColor c, const char* format, ...);
-inline bool log_formatted_v(const char* format, va_list args);
+inline bool log_formatted_v(LC_LogAttrib a, LC_LogColor c, const char* format, va_list args);
 inline bool log_formatted(LC_LogAttrib a, LC_LogColor c, const char* format, ...);
 inline bool log_formatted(LC_LogColor c, const char* format, ...);
 #if defined(__APPLE__) && __OBJC__ == 1
@@ -841,18 +841,27 @@ inline bool log_info(const char* format, ...)
 /*------------------------------------------------------------------------------
 |    log_formatted_t
 +-----------------------------------------------------------------------------*/
-inline bool log_formatted_t(const char* log_tag, LC_LogAttrib a, LC_LogColor c, const char* format, va_list args)
+inline bool log_formatted_t_v(const char* log_tag, LC_LogAttrib a, LC_LogColor c, const char* format, va_list args)
 {
    LC_LogDef(log_tag, a, c).printf(format, args);
    return true;
 }
 
 /*------------------------------------------------------------------------------
-|    log_formatted
+|    log_formatted_t
 +-----------------------------------------------------------------------------*/
 inline bool log_formatted_t(const char* log_tag, LC_LogAttrib a, LC_LogColor c, const char* format, ...)
 {
    VA_LIST_CONTEXT(format, LC_LogDef(log_tag, a, c).printf(format, args));
+   return true;
+}
+
+/*------------------------------------------------------------------------------
+|    log_formatted_v
++-----------------------------------------------------------------------------*/
+inline bool log_formatted_v(LC_LogAttrib a, LC_LogColor c, const char* format, va_list args)
+{
+   LC_LogDef(LOG_TAG, a, c).printf(format, args);
    return true;
 }
 
