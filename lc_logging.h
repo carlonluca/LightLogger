@@ -224,10 +224,10 @@ inline bool log_critical_t(const char* log_tag, const char* format, ...);
 inline bool log_critical_v(const char* format, va_list args);
 inline bool log_critical(const char* format, ...);
 #if defined(__APPLE__) && __OBJC__ == 1
-inline BOOL log_critical_t_v(const char* log_tag, NSString* format, va_list args);
-inline BOOL log_critical_t(const char* log_tag, NSString* format, ...);
-inline BOOL log_critical_v(NSString* format, va_list args);
-inline BOOL log_critical(NSString* format, ...);
+inline bool log_critical_t_v(const char* log_tag, NSString* format, va_list args);
+inline bool log_critical_t(const char* log_tag, NSString* format, ...);
+inline bool log_critical_v(NSString* format, va_list args);
+inline bool log_critical(NSString* format, ...);
 #endif // defined(__APPLE__) && __OBJC__ == 1
 #else
 inline bool log_critical_t_v(...) { return false; }
@@ -242,10 +242,10 @@ inline bool log_err_t(const char* log_tag, const char* format, ...);
 inline bool log_err_v(const char* format, va_list args);
 inline bool log_err(const char* format, ...);
 #if defined(__APPLE__) && __OBJC__ == 1
-inline BOOL log_err_t_v(const char* log_tag, NSString* format, va_list args);
-inline BOOL log_err_t(const char* log_tag, NSString* format, ...);
-inline BOOL log_err_v(NSString* format, va_list args);
-inline BOOL log_err(NSString* format, ...);
+inline bool log_err_t_v(const char* log_tag, NSString* format, va_list args);
+inline bool log_err_t(const char* log_tag, NSString* format, ...);
+inline bool log_err_v(NSString* format, va_list args);
+inline bool log_err(NSString* format, ...);
 #endif // defined(__APPLE__) && __OBJC__ == 1
 #else
 inline bool log_err_t_v(...) { return false; }
@@ -260,10 +260,10 @@ inline bool log_warn_t(const char* log_tag, const char* format, ...);
 inline bool log_warn_v(const char* format, va_list args);
 inline bool log_warn(const char* format, ...);
 #if defined(__APPLE__) && __OBJC__ == 1
-inline BOOL log_warn_t_v(const char* log_tag, NSString* format, va_list args);
-inline BOOL log_warn_t(const char* log_tag, NSString* format, ...);
-inline BOOL log_warn_v(NSString* format, va_list args);
-inline BOOL log_warn(NSString* format, ...);
+inline bool log_warn_t_v(const char* log_tag, NSString* format, va_list args);
+inline bool log_warn_t(const char* log_tag, NSString* format, ...);
+inline bool log_warn_v(NSString* format, va_list args);
+inline bool log_warn(NSString* format, ...);
 #endif // defined(__APPLE__) && __OBJC__ == 1
 #else
 inline bool log_warn_t_v(...) { return false; }
@@ -284,10 +284,10 @@ inline bool log_formatted_v(LC_LogAttrib a, LC_LogColor c, const char* format, v
 inline bool log_formatted(LC_LogAttrib a, LC_LogColor c, const char* format, ...);
 inline bool log_formatted(LC_LogColor c, const char* format, ...);
 #if defined(__APPLE__) && __OBJC__ == 1
-inline BOOL log_info_t_v(const char* log_tag, NSString* format, va_list args);
-inline BOOL log_info_t(const char* log_tag, NSString* format, ...);
-inline BOOL log_info_v(NSString* format, va_list args);
-inline BOOL log_info(NSString* format, ...);
+inline bool log_info_t_v(const char* log_tag, NSString* format, va_list args);
+inline bool log_info_t(const char* log_tag, NSString* format, ...);
+inline bool log_info_v(NSString* format, va_list args);
+inline bool log_info(NSString* format, ...);
 #endif // defined(__APPLE__) && __OBJC__ == 1
 #else
 inline bool log_info_t_v(...)      { return true; }
@@ -306,10 +306,10 @@ inline bool log_verbose_t(const char* log_tag, const char* format, ...);
 inline bool log_verbose_v(const char* format, va_list args);
 inline bool log_verbose(const char* format, ...);
 #if defined(__APPLE__) && __OBJC__ == 1
-inline BOOL log_vervose_t_v(const char* log_tag, NSString* format, va_list args);
-inline BOOL log_verbose_t(const char* log_tag, NSString* format, ...);
-inline BOOL log_verbose_v(NSString* format, va_list args);
-inline BOOL log_verbose(NSString* format, ...);
+inline bool log_vervose_t_v(const char* log_tag, NSString* format, va_list args);
+inline bool log_verbose_t(const char* log_tag, NSString* format, ...);
+inline bool log_verbose_v(NSString* format, va_list args);
+inline bool log_verbose(NSString* format, ...);
 #endif // defined(__APPLE__) && __OBJC__ == 1
 #else
 inline bool log_verbose_t_v(...) { return true; }
@@ -1143,7 +1143,7 @@ inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int 
    void* addrlist[max_frames + 1];
 
    // retrieve current stack addresses
-   int addrlen = backtrace(addrlist, sizeof(addrlist) / sizeof(void*) );
+   int addrlen = backtrace(addrlist, (int)(sizeof(addrlist) / sizeof(void*)));
 
    if (addrlen == 0) {
       stream << "<empty, possibly corrupt>";
@@ -1540,7 +1540,11 @@ template <typename T> inline void LC_Log<T>::printf(NSString* format, va_list ar
 
    // Build the NSString from the format. This includes NSString's in args.
    NSString* s1 = [NSString stringWithUTF8String : m_string.str().c_str()];
+#if __has_feature(objc_arc)
+   NSString* s2 = [[NSString alloc] initWithFormat:format arguments : args];
+#else
    NSString* s2 = [[[NSString alloc] initWithFormat:format arguments : args] autorelease];
+#endif // __has_feature(objc_arc)
    NSString* s = [NSString stringWithFormat : @"%@%@", s1, s2];
 
    printf([s cStringUsingEncoding : NSUTF8StringEncoding]);
@@ -1804,11 +1808,13 @@ inline void LC_Output2XCodeColors::printf(LC_Log<LC_Output2XCodeColors>& logger,
       colorCode = getColorForLevel(logger.m_level);
 
    NSString* s;
-   if (checkEnv())
-      s = [NSString stringWithFormat : XC_COL_ESC @"%@%s" XC_COL_RESET @"\n",
-      colorCode, final.c_str()];
-   else
-      s = [NSString stringWithFormat : @"%s", final.c_str()];
+#ifdef XCODE_COLORING_ENABLED
+   //if (checkEnv())
+      s = [NSString stringWithFormat : XC_COL_ESC @"%@%s" XC_COL_RESET @"\n", colorCode, final.c_str()];
+#else
+   //else
+      s = [NSString stringWithFormat : @"%s\n", final.c_str()];
+#endif // XCODE_COLORING_ENABLED
 
    ::printf("%s", [s cStringUsingEncoding : NSUTF8StringEncoding]);
 }
