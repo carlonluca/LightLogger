@@ -5,13 +5,12 @@
 #
 
 !android {
-QT       += core sql
+QT       += core gui sql qml quick
 }
 else {
 QT       -= core
 LIBS     += -lgnustl_shared
 }
-QT       -= gui
 
 TARGET   = LightLogger
 CONFIG   += console
@@ -65,4 +64,8 @@ OTHER_FILES += \
     android/res/drawable-ldpi/icon.png \
     android/res/drawable-hdpi/icon.png \
     android/res/layout/splash.xml \
-    android/res/values-el/strings.xml
+    android/res/values-el/strings.xml \
+    main.qml
+
+RESOURCES += \
+    resources.qrc

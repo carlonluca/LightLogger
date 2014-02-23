@@ -33,8 +33,12 @@
  |    includes
  +-----------------------------------------------------------------------------*/
 #ifndef __ANDROID__
-#include <QCoreApplication>
+#include <QGuiApplication>
 #include <QElapsedTimer>
+#if defined(QT_QML_LIB) && defined(QT_QUICK_LIB)
+#include <QtQuick/QQuickView>
+#include <QQmlEngine>
+#endif
 #endif
 
 #include "lc_logging.h"
@@ -73,8 +77,12 @@ void test_func()
 /*------------------------------------------------------------------------------
  |    main
  +-----------------------------------------------------------------------------*/
-int main(int /* argc */, char** /* argv */)
+int main(int argc, char** argv)
 {
+#if defined(QT_QML_LIB) && defined(QT_QUICK_LIB)
+   QGuiApplication a(argc, argv);
+#endif
+
 #if 0
    QElapsedTimer timer;
    timer.start();
@@ -143,6 +151,12 @@ int main(int /* argc */, char** /* argv */)
       LC_Log<LC_Output2Std> logger(LC_LOG_CRITICAL);
       logger.stream() << "Critical log with stream.";
    }
+
+#if defined(QT_QML_LIB) && defined(QT_QUICK_LIB)
+   QQuickView view;
+   LC_QMLLogger::registerObject(view.rootContext());
+   view.setSource(QUrl("qrc:///main.qml"));
+#endif
 
    return 0;
 }

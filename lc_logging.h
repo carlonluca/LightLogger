@@ -65,10 +65,20 @@
 #else
 #include <assert.h>
 #endif // __ANDROID__
+
+// Qt-specific portion
 #ifdef QT_SQL_LIB
+#include <QObject>
 #include <QSqlQuery>
 #include <QSqlError>
 #endif // QT_SQL_LIB
+
+#ifdef QT_QML_LIB
+#include <QObject>
+#include <QQmlContext>
+#endif // QT_QML_LIB
+
+// Apple-specific portion
 #if defined(__APPLE__) && (__OBJC__ == 1)
 #include <Foundation/Foundation.h>
 #endif
@@ -1914,6 +1924,52 @@ inline std::string lc_current_time()
 
    return result;
 }
+
+#ifdef QT_QML_LIB
+/*------------------------------------------------------------------------------
+|    LC_QMLLogger
++-----------------------------------------------------------------------------*/
+class LC_QMLLogger : public QObject
+{
+   Q_OBJECT
+public:
+   static LC_QMLLogger& instance() {
+      static LC_QMLLogger instance;
+      return instance;
+   }
+
+   Q_INVOKABLE void debug(QString s) const {
+      log_debug(qPrintable(s));
+   }
+
+   Q_INVOKABLE bool verbose(QString s) const {
+      return log_verbose(qPrintable(s));
+   }
+
+   Q_INVOKABLE bool info(QString s) const {
+      return log_info(qPrintable(s));
+   }
+
+   Q_INVOKABLE bool warn(QString s) const {
+      return log_warn(qPrintable(s));
+   }
+
+   Q_INVOKABLE bool error(QString s) const {
+      return log_err(qPrintable(s));
+   }
+
+   Q_INVOKABLE bool critical(QString s) const {
+      return log_critical(qPrintable(s));
+   }
+
+   static void registerObject(QQmlContext* context) {
+      context->setContextProperty(QStringLiteral("logger"), &(instance()));
+   }
+
+private:
+   LC_QMLLogger() : QObject() {}
+};
+#endif // QT_QML_LIB
 
 // Prevent from using outside.
 #undef VA_LIST_CONTEXT
