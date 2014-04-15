@@ -51,7 +51,7 @@
 #include <execinfo.h>
 #include <cxxabi.h>
 #elif defined(_WIN32) || defined(_WIN32_WCE)
-#include <WinBase.h>
+#include <Windows.h>
 #if WINVER < 0x0602
 // It seems Windows 8.1 does not support DbgHelp yet.
 #include <DbgHelp.h>
@@ -81,6 +81,13 @@
 // Apple-specific portion
 #if defined(__APPLE__) && (__OBJC__ == 1)
 #include <Foundation/Foundation.h>
+#endif
+
+// Windows specific portion.
+#if defined(_WIN32) || defined(_WIN32_WCE)
+// __PRETTY_FUNCTION__ is a gcc extension not available on Microsoft
+// compiler. I'll use the nearest approximation.
+#define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
 #define VA_LIST_CONTEXT(last, i) \
@@ -1956,6 +1963,7 @@ inline std::string lc_current_time()
 
    return result;
 }
+#endif // WIN32
 
 #ifdef QT_QML_LIB
 /*------------------------------------------------------------------------------
@@ -2007,5 +2015,4 @@ private:
 #undef VA_LIST_CONTEXT
 #undef LOG_UNUSED
 
-#endif // WIN32
 #endif // LC_LOGGING_H
