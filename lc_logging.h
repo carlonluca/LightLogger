@@ -425,7 +425,7 @@ inline void lc_formatted_printf(FILE* f, LC_LogAttrib attrib, LC_LogColor color,
  +-----------------------------------------------------------------------------------------*/
 inline void log_func()
 {
-   log_debug(@"Entering: %s.", __PRETTY_FUNCTION__);
+   log_debug("Entering: %s.", __PRETTY_FUNCTION__);
 }
 
 /*-----------------------------------------------------------------------------------------
@@ -433,7 +433,7 @@ inline void log_func()
  +-----------------------------------------------------------------------------------------*/
 inline void log_info_func()
 {
-   log_info(@"Entering: %s.", __PRETTY_FUNCTION__);
+   log_info("Entering: %s.", __PRETTY_FUNCTION__);
 }
 
 /*-----------------------------------------------------------------------------------------
@@ -441,7 +441,7 @@ inline void log_info_func()
  +-----------------------------------------------------------------------------------------*/
 inline void log_verbose_func()
 {
-   log_verbose(@"Entering: %s.", __PRETTY_FUNCTION__);
+   log_verbose("Entering: %s.", __PRETTY_FUNCTION__);
 }
 
 /*-----------------------------------------------------------------------------------------
@@ -449,7 +449,7 @@ inline void log_verbose_func()
  +-----------------------------------------------------------------------------------------*/
 inline void log_debug_func()
 {
-   log_debug(@"Entering: %s.", __PRETTY_FUNCTION__);
+   log_debug("Entering: %s.", __PRETTY_FUNCTION__);
 }
 
 // Assertions.
