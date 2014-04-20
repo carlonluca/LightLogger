@@ -30,6 +30,13 @@
 * 5. XCODE_COLORING_ENABLED: Enables coloring with XCode coloring format. This also
 *    enables COLORING_ENABLED automatically.
 *
+* Chaging default logger delegate
+* LC_LogDef is a typedef used in all the convenience functions. By default its value is
+* LC_Log<LC_Output2Std>. To change it to use one of the other delegates or to use a custom
+* defined delegate, just define the macro CUSTOM_LOGGER to the name of the custom
+* delegate to use *before* including this header. Creating a wrapper header may be a good
+* solution to do this in your entire sources.
+*
 * Version: 1.0.0
 */
 
@@ -564,7 +571,7 @@ typedef LC_Log<LC_Output2Std> LC_LogStd;
 class LC_Output2FILE
 {
 public:
-   static void printf(LC_Log<LC_Output2Std>& logger, va_list args);
+   static void printf(LC_Log<LC_Output2FILE>& logger, va_list args);
 
 private:
    static FILE*& stream();
@@ -613,6 +620,7 @@ typedef LC_Log<LC_Output2XCodeColors> LC_LogXCodeColors;
 #endif
 
 // Define the default logger.
+#ifndef CUSTOM_LOGGER
 #ifdef __ANDROID__
 typedef LC_Log<LC_OutputAndroid> LC_LogDef;
 #elif defined(XCODE_COLORING_ENABLED)
@@ -622,6 +630,10 @@ typedef LC_Log<LC_Output2MSVS> LC_LogDef;
 #else
 typedef LC_Log<LC_Output2Std> LC_LogDef;
 #endif
+#else
+// The user MUST define LC_LogDef each time before including this header.
+typedef LC_Log<CUSTOM_LOGGER> LC_LogDef;
+#endif // CUSTOM_LOGGER
 
 #ifdef ENABLE_LOG_CRITICAL
 /*------------------------------------------------------------------------------
@@ -1778,12 +1790,13 @@ inline FILE*& LC_Output2FILE::stream()
 /*------------------------------------------------------------------------------
 |    LC_Output2File::output
 +-----------------------------------------------------------------------------*/
-inline void LC_Output2FILE::printf(LC_Log<LC_Output2Std>& logger, va_list args)
+inline void LC_Output2FILE::printf(LC_Log<LC_Output2FILE>& logger, va_list args)
 {
    // Prepend.
    std::string final = logger.m_string.str();
    logger.prependHeader(final);
    logger.prependLogTagIfNeeded(final);
+   final.append("\n");
 
    FILE* pStream = stream();
    if (!pStream)
