@@ -1102,7 +1102,7 @@ inline bool log_verbose(NSString* format, ...)
 +-----------------------------------------------------------------------------*/
 inline void log_debug_t_v(const char* log_tag, const char* format, va_list args)
 {
-   LC_LogStd(log_tag, LC_LOG_DEBUG).printf(format, args);
+   LC_LogDef(log_tag, LC_LOG_DEBUG).printf(format, args);
 }
 
 /*------------------------------------------------------------------------------
@@ -1110,7 +1110,7 @@ inline void log_debug_t_v(const char* log_tag, const char* format, va_list args)
 +-----------------------------------------------------------------------------*/
 inline void log_debug_t(const char* log_tag, const char* format, ...)
 {
-   VA_LIST_CONTEXT(format, LC_LogStd(log_tag, LC_LOG_DEBUG).printf(format, args));
+   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_DEBUG).printf(format, args));
 }
 
 /*------------------------------------------------------------------------------
@@ -1118,7 +1118,7 @@ inline void log_debug_t(const char* log_tag, const char* format, ...)
 +-----------------------------------------------------------------------------*/
 inline void log_debug_v(const char* format, va_list args)
 {
-   LC_LogStd(LC_LOG_DEBUG).printf(format, args);
+   LC_LogDef(LC_LOG_DEBUG).printf(format, args);
 }
 
 /*------------------------------------------------------------------------------
@@ -1126,7 +1126,7 @@ inline void log_debug_v(const char* format, va_list args)
 +-----------------------------------------------------------------------------*/
 inline void log_debug(const char* format, ...)
 {
-   VA_LIST_CONTEXT(format, LC_LogStd(LC_LOG_DEBUG).printf(format, args));
+   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_DEBUG).printf(format, args));
 }
 
 #if defined(__APPLE__) && __OBJC__ == 1
