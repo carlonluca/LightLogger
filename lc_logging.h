@@ -49,6 +49,7 @@
 * defined delegate, just define the macro CUSTOM_LOGGER to the name of the custom
 * delegate to use *before* including this header. Creating a wrapper header may be a good
 * solution to do this in your entire sources.
+* CUSTOM_LOG_FILE is the file path of the file to log into. The default value if "output.log".
 *
 * Version: 1.0.0
 */
@@ -1795,6 +1796,9 @@ inline FILE*& LC_Output2FILE::stream()
       if (errno_t err = fopen_s(&pStream, "output.log", "a"))
          ::printf("Failed to open output.log: %d,", err);
 #else
+#ifndef CUSTOM_LOG_FILE
+#define CUSTOM_LOG_FILE "output.log"
+#endif
    static FILE* pStream = fopen("output.log", "a");
 #endif // _MSC_VER
    return pStream;
