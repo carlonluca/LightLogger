@@ -374,6 +374,17 @@ inline void log_debug_v(...)   {}
 inline void log_debug(...)     {}
 #endif // ENABLE_LOG_DEBUG
 
+inline bool log_disabled_t_v(const char* log_tag, const char* format, va_list args);
+inline bool log_disabled_t(const char* log_tag, const char* format, ...);
+inline bool log_disabled_v(const char* format, va_list args);
+inline bool log_disabled(const char* format, ...);
+#if defined(__APPLE__) && __OBJC__ == 1
+inline bool log_disabled_t_v(const char* log_tag, NSString* format, va_list args);
+inline bool log_disabled_t(const char* log_tag, NSString* format, ...);
+inline bool log_disabled_v(NSString* format, va_list args);
+inline bool log_disabled(NSString* format, ...);
+#endif // defined(__APPLE__) && __OBJC__ == 1
+
 #if !defined(__ANDROID__) && (!defined(WINVER) || WINVER < 0x0602)
 inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int max_frames = 65);
 inline void log_stacktrace(const char* log_tag, unsigned int max_frames = 65);
@@ -1177,6 +1188,96 @@ inline void log_debug(NSString* format, ...)
 }
 #endif // defined(__APPLE__) && __OBJC__ == 1
 #endif // ENABLE_LOG_DEBUG
+
+/*------------------------------------------------------------------------------
+|    log_disabled_t_v
++-----------------------------------------------------------------------------*/
+inline bool log_disabled_t_v(const char* log_tag, const char* format, va_list args)
+{
+   LOG_UNUSED(log_tag);
+   LOG_UNUSED(format);
+   LOG_UNUSED(args);
+
+   return true;
+}
+
+/*------------------------------------------------------------------------------
+|    log_disabled_t
++-----------------------------------------------------------------------------*/
+inline bool log_disabled_t(const char* log_tag, const char* format, ...)
+{
+   LOG_UNUSED(log_tag);
+   LOG_UNUSED(format);
+
+   return true;
+}
+
+/*------------------------------------------------------------------------------
+|    log_disabled_v
++-----------------------------------------------------------------------------*/
+inline bool log_disabled_v(const char* format, va_list args)
+{
+   LOG_UNUSED(format);
+   LOG_UNUSED(args);
+
+   return true;
+}
+
+/*------------------------------------------------------------------------------
+|    log_disabled
++-----------------------------------------------------------------------------*/
+inline bool log_disabled(const char* format, ...)
+{
+   LOG_UNUSED(format);
+
+   return true;
+}
+
+#if defined(__APPLE__) && __OBJC__ == 1
+/*------------------------------------------------------------------------------
+|    log_disabled_t_v
++-----------------------------------------------------------------------------*/
+inline bool log_disabled_t_v(const char* log_tag, NSString* format, va_list args)
+{
+   LOG_UNUSED(log_tag);
+   LOG_UNUSED(format);
+   LOG_UNUSED(args);
+
+   return true;
+}
+
+/*------------------------------------------------------------------------------
+|    log_disabled_t
++-----------------------------------------------------------------------------*/
+inline bool log_disabled_t(const char* log_tag, NSString* format, ...)
+{
+   LOG_UNUSED(log_tag);
+   LOG_UNUSED(format);
+
+   return true;
+}
+
+/*------------------------------------------------------------------------------
+|    log_disabled_v
++-----------------------------------------------------------------------------*/
+inline bool log_disabled_v(NSString* format, va_list args)
+{
+   LOG_UNUSED(format);
+   LOG_UNUSED(args);
+
+   return true;
+}
+
+/*------------------------------------------------------------------------------
+|    log_disabled
++-----------------------------------------------------------------------------*/
+inline bool log_disabled(NSString* format, ...)
+{
+   LOG_UNUSED(format);
+
+   return true;
+}
+#endif // defined(__APPLE__) && __OBJC__ == 1
 
 // Convenience macros. The same as using the inlined functions.
 #ifdef __GNUC__
