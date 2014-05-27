@@ -1926,6 +1926,30 @@ inline void LC_Output2FILE::printf(LC_Log<LC_Output2FILE>& logger, va_list args)
 typedef LC_Log<LC_Output2FILE> LC_LogFile;
 
 #ifdef ENABLE_MSVS_OUTPUT
+#include <memory>
+/*------------------------------------------------------------------------------
+|    string_format
++-----------------------------------------------------------------------------*/
+inline std::string string_format(const std::string fmt_str, va_list ap)
+{
+	size_t final_n, n = fmt_str.size() * 2;
+	std::string str;
+	std::unique_ptr<char[]> formatted;
+	while (1) {
+		formatted.reset(new char[n]);
+		strcpy_s(&formatted[0], n, fmt_str.c_str());
+		final_n = vsnprintf_s(&formatted[0], n, n - 1, fmt_str.c_str(), ap);
+		if (final_n < 0 || final_n >= n)
+			n += abs((long long)(final_n - n + 1));
+		else
+			break;
+	}
+	return std::string(formatted.get());
+}
+
+/*------------------------------------------------------------------------------
+|    LC_Output2MSVS::printf
++-----------------------------------------------------------------------------*/
 inline void LC_Output2MSVS::printf(LC_Log<LC_Output2MSVS>& logger, va_list args)
 {
    // Prepend.
@@ -1934,7 +1958,7 @@ inline void LC_Output2MSVS::printf(LC_Log<LC_Output2MSVS>& logger, va_list args)
    logger.prependLogTagIfNeeded(final);
    final.append("\n");
 
-   OutputDebugStringA(final.c_str());
+   OutputDebugStringA(string_format(final, args).c_str());
 }
 #endif // ENABLE_MSVS_OUTPUT
 
