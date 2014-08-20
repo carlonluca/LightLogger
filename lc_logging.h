@@ -459,37 +459,14 @@ inline void lc_formatted_printf(FILE* f, LC_LogAttrib attrib, LC_LogColor color,
    VA_LIST_CONTEXT(format, vfprintf(f, final.c_str(), args));
 }
 
-/*-----------------------------------------------------------------------------------------
- |    log_func
- +-----------------------------------------------------------------------------------------*/
-inline void log_func()
-{
-   log_debug("Entering: %s.", __PRETTY_FUNCTION__);
-}
-
-/*-----------------------------------------------------------------------------------------
- |    log_info_func
- +-----------------------------------------------------------------------------------------*/
-inline void log_info_func()
-{
-   log_info("Entering: %s.", __PRETTY_FUNCTION__);
-}
-
-/*-----------------------------------------------------------------------------------------
- |    log_verbose_func
- +-----------------------------------------------------------------------------------------*/
-inline void log_verbose_func()
-{
-   log_verbose("Entering: %s.", __PRETTY_FUNCTION__);
-}
-
-/*-----------------------------------------------------------------------------------------
- |    log_debug_func
- +-----------------------------------------------------------------------------------------*/
-inline void log_debug_func()
-{
-   log_debug("Entering: %s.", __PRETTY_FUNCTION__);
-}
+#define log_func \
+   log_debug(@"Entering: %s.", __PRETTY_FUNCTION__)
+#define log_info_func \
+   log_info(@"Entering: %s.", __PRETTY_FUNCTION__)
+#define log_verbose_func \
+   log_verbose(@"Entering: %s.", __PRETTY_FUNCTION__)
+#define log_debug_func \
+   log_debug(@"Entering: %s.", __PRETTY_FUNCTION__)
 
 // Assertions.
 #ifdef __ANDROID__
@@ -2165,6 +2142,36 @@ private:
    LC_QMLLogger() : QObject() {}
 };
 #endif // QT_QML_LIB
+
+#ifdef QT_CORE_LIB
+/*------------------------------------------------------------------------------
+|    log_handler
++-----------------------------------------------------------------------------*/
+/**
+ * @brief log_handler Function to handle Qt debugging output.
+ * @param type
+ * @param msg
+ */
+inline
+void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s)
+{
+   switch (type) {
+   case QtDebugMsg:
+      log_verbose("%s", qPrintable(s));
+      break;
+   case QtWarningMsg:
+      log_warn("%s", qPrintable(s));
+      break;
+   case QtCriticalMsg:
+      log_err("%s", qPrintable(s));
+      break;
+   case QtFatalMsg:
+      log_critical("%s", qPrintable(s));
+      break;
+   }
+}
+
+#endif // QT_CORE_LIB
 
 // Prevent from using outside.
 #undef VA_LIST_CONTEXT
