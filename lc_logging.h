@@ -243,6 +243,13 @@ enum LC_LogColor {
 };
 
 #ifdef XCODE_COLORING_ENABLED
+/*------------------------------------------------------------------------------
+ |    lc_xc_col
+ +-----------------------------------------------------------------------------*/
+inline const NSString* lc_xc_col(const int& index)
+{
+   // By using an inline function I ensure a single presence in memory of the
+   // array.
 static const NSString* LC_XC_COL [] = {
    @"fg0,0,0;",
    @"fg255,0,0;",
@@ -254,6 +261,8 @@ static const NSString* LC_XC_COL [] = {
    @"fg255,255,255;",
    @"fg0,0,0;"
 };
+   return LC_XC_COL[index];
+}
 #endif // XCODE_COLORING_ENABLED
 
 #ifdef ENABLE_LOG_CRITICAL
@@ -344,7 +353,7 @@ inline bool log_verbose_t(const char* log_tag, const char* format, ...);
 inline bool log_verbose_v(const char* format, va_list args);
 inline bool log_verbose(const char* format, ...);
 #if defined(__APPLE__) && __OBJC__ == 1
-inline bool log_vervose_t_v(const char* log_tag, NSString* format, va_list args);
+inline bool log_verbose_t_v(const char* log_tag, NSString* format, va_list args);
 inline bool log_verbose_t(const char* log_tag, NSString* format, ...);
 inline bool log_verbose_v(NSString* format, va_list args);
 inline bool log_verbose(NSString* format, ...);
@@ -1984,7 +1993,7 @@ inline void LC_Output2XCodeColors::printf(LC_Log<LC_Output2XCodeColors>& logger,
 
    const NSString* colorCode;
    if (logger.m_level == LC_LOG_NONE)
-      colorCode = LC_XC_COL[(int) logger.m_color];
+      colorCode = lc_xc_col((int)logger.m_color);
    else
       colorCode = getColorForLevel(logger.m_level);
 
