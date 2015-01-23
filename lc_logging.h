@@ -51,7 +51,7 @@
 * solution to do this in your entire sources.
 * CUSTOM_LOG_FILE is the file path of the file to log into. The default value if "output.log".
 *
-* Version: 1.0.0
+* Version: 1.1.0
 */
 
 #ifndef LC_LOGGING_H
