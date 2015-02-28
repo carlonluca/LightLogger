@@ -38,10 +38,18 @@
 *    not according to the platform.
 * 2. ENABLE_LOG_*: if defined, it enables the specific log level.
 * 3. BUILD_LOG_LEVEL_*: if defined it enables all the levels with equal or higher
-*    priority.
+*    priority:
+*    - BUILD_LOG_LEVEL_DEBUG;
+*    - BUILD_LOG_LEVEL_VERBOSE;
+*    - BUILD_LOG_LEVEL_INFORMATION;
+*    - BUILD_LOG_LEVEL_WARNING;
+*    - BUILD_LOG_LEVEL_ERROR;
+*    - BUILD_LOG_LEVEL_CRITICAL.
 * 4. BUILD_LOG_LEVEL_ALL: enables all the logs.
 * 5. XCODE_COLORING_ENABLED: Enables coloring with XCode coloring format. This also
 *    enables COLORING_ENABLED automatically.
+* 6. CUSTOM_LOG_FILE: path to the log file.
+* 7. ENABLE_CODE_LOCATION: prepends the location in the sources for all the logs.
 *
 * Chaging default logger delegate
 * LC_LogDef is a typedef used in all the convenience functions. By default its value is
@@ -49,9 +57,8 @@
 * defined delegate, just define the macro CUSTOM_LOGGER to the name of the custom
 * delegate to use *before* including this header. Creating a wrapper header may be a good
 * solution to do this in your entire sources.
-* CUSTOM_LOG_FILE is the file path of the file to log into. The default value if "output.log".
 *
-* Version: 1.1.0
+* Version: 1.2.0
 */
 
 #ifndef LC_LOGGING_H
@@ -67,6 +74,7 @@
 #include <cstring>
 #include <iostream>
 #include <cstdlib>
+#include <libgen.h>
 #if !defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__ANDROID__)
 #include <unistd.h>
 #include <execinfo.h>
@@ -86,13 +94,6 @@
 #else
 #include <assert.h>
 #endif // __ANDROID__
-
-// Qt-specific portion
-#ifdef QT_SQL_LIB
-#include <QObject>
-#include <QSqlQuery>
-#include <QSqlError>
-#endif // QT_SQL_LIB
 
 #ifdef QT_QML_LIB
 #include <QObject>
@@ -115,6 +116,12 @@
    {va_list args; va_start(args, last); i; va_end(args); }
 #define LOG_UNUSED(x) \
    (void) x
+#ifdef __GNUC__
+#define LC_LIKELY(x) \
+   __builtin_expect((x), 1)
+#define LC_UNLIKELY(x) \
+   __builtin_expect((x), 0)
+#endif // __GNUC__
 
 // Coloring is automatically enabled if XCODE_COLORING_ENABLED is defined.
 #ifdef XCODE_COLORING_ENABLED
@@ -250,156 +257,21 @@ inline const NSString* lc_xc_col(const int& index)
 {
    // By using an inline function I ensure a single presence in memory of the
    // array.
-static const NSString* LC_XC_COL [] = {
-   @"fg0,0,0;",
-   @"fg255,0,0;",
-   @"fg34,139,34;",
-   @"fg255,215,0;",  // Gold should be more visible.
-   @"fg0,0,255;",
-   @"fg255,20,147;", // Magenta.
-   @"fg0,255,255;",
-   @"fg255,255,255;",
-   @"fg0,0,0;"
-};
+   static const NSString* LC_XC_COL[] = {
+      @"fg0,0,0;",
+      @"fg255,0,0;",
+      @"fg34,139,34;",
+      @"fg255,215,0;",  // Gold should be more visible.
+      @"fg0,0,255;",
+      @"fg255,20,147;", // Magenta.
+      @"fg0,255,255;",
+      @"fg255,255,255;",
+      @"fg0,0,0;"
+   };
+   
    return LC_XC_COL[index];
 }
 #endif // XCODE_COLORING_ENABLED
-
-#ifdef ENABLE_LOG_CRITICAL
-inline bool log_critical_t_v(const char* log_tag, const char* format, va_list args);
-inline bool log_critical_t(const char* log_tag, const char* format, ...);
-inline bool log_critical_v(const char* format, va_list args);
-inline bool log_critical(const char* format, ...);
-#if defined(__APPLE__) && __OBJC__ == 1
-inline bool log_critical_t_v(const char* log_tag, NSString* format, va_list args);
-inline bool log_critical_t(const char* log_tag, NSString* format, ...);
-inline bool log_critical_v(NSString* format, va_list args);
-inline bool log_critical(NSString* format, ...);
-#endif // defined(__APPLE__) && __OBJC__ == 1
-#else
-inline bool log_critical_t_v(...) { return false; }
-inline bool log_critical_t(...)   { return false; }
-inline bool log_critical_v(...)   { return false; }
-inline bool log_critical(...)     { return false; }
-#endif // ENABLE_LOG_CRITICAL
-
-#ifdef ENABLE_LOG_ERROR
-inline bool log_err_t_v(const char* log_tag, const char* format, va_list args);
-inline bool log_err_t(const char* log_tag, const char* format, ...);
-inline bool log_err_v(const char* format, va_list args);
-inline bool log_err(const char* format, ...);
-#if defined(__APPLE__) && __OBJC__ == 1
-inline bool log_err_t_v(const char* log_tag, NSString* format, va_list args);
-inline bool log_err_t(const char* log_tag, NSString* format, ...);
-inline bool log_err_v(NSString* format, va_list args);
-inline bool log_err(NSString* format, ...);
-#endif // defined(__APPLE__) && __OBJC__ == 1
-#else
-inline bool log_err_t_v(...) { return false; }
-inline bool log_err_t(...)   { return false; }
-inline bool log_err_v(...)   { return false; }
-inline bool log_err(...)     { return false; }
-#endif // ENABLE_LOG_ERROR
-
-#ifdef ENABLE_LOG_WARNING
-inline bool log_warn_t_v(const char* log_tag, const char* format, va_list args);
-inline bool log_warn_t(const char* log_tag, const char* format, ...);
-inline bool log_warn_v(const char* format, va_list args);
-inline bool log_warn(const char* format, ...);
-#if defined(__APPLE__) && __OBJC__ == 1
-inline bool log_warn_t_v(const char* log_tag, NSString* format, va_list args);
-inline bool log_warn_t(const char* log_tag, NSString* format, ...);
-inline bool log_warn_v(NSString* format, va_list args);
-inline bool log_warn(NSString* format, ...);
-#endif // defined(__APPLE__) && __OBJC__ == 1
-#else
-inline bool log_warn_t_v(...) { return false; }
-inline bool log_warn_t(...)   { return false; }
-inline bool log_warn_v(...)   { return false; }
-inline bool log_warn(...)     { return false; }
-#endif // ENABLE_LOG_WARNING
-
-#ifdef ENABLE_LOG_INFORMATION
-inline bool log_info_t_v(const char* log_tag, const char* format, va_list args);
-inline bool log_info_t(const char* log_tag, const char* format, ...);
-inline bool log_info_v(const char* format, va_list args);
-inline bool log_info(const char* format, ...);
-// TODO: Some more functions might be needed!
-inline bool log_formatted_t_v(const char* log_tag, LC_LogAttrib a, LC_LogColor c, const char* format, va_list args);
-inline bool log_formatted_t(const char* log_tag, LC_LogAttrib a, LC_LogColor c, const char* format, ...);
-inline bool log_formatted_v(LC_LogAttrib a, LC_LogColor c, const char* format, va_list args);
-inline bool log_formatted(LC_LogAttrib a, LC_LogColor c, const char* format, ...);
-inline bool log_formatted(LC_LogColor c, const char* format, ...);
-#if defined(__APPLE__) && __OBJC__ == 1
-inline bool log_info_t_v(const char* log_tag, NSString* format, va_list args);
-inline bool log_info_t(const char* log_tag, NSString* format, ...);
-inline bool log_info_v(NSString* format, va_list args);
-inline bool log_info(NSString* format, ...);
-#endif // defined(__APPLE__) && __OBJC__ == 1
-#else
-inline bool log_info_t_v(...)      { return true; }
-inline bool log_info_t(...)        { return true; }
-inline bool log_info_v(...)        { return true; }
-inline bool log_info(...)          { return true; }
-inline bool log_formatted_t_v(...) { return true; }
-inline bool log_formatted_t(...)   { return true; }
-inline bool log_formatted_v(...)   { return true; }
-inline bool log_formatted(...)     { return true; }
-#endif // ENABLE_LOG_INFORMATION
-
-#ifdef ENABLE_LOG_VERBOSE
-inline bool log_verbose_t_v(const char* log_tag, const char* format, va_list args);
-inline bool log_verbose_t(const char* log_tag, const char* format, ...);
-inline bool log_verbose_v(const char* format, va_list args);
-inline bool log_verbose(const char* format, ...);
-#if defined(__APPLE__) && __OBJC__ == 1
-inline bool log_verbose_t_v(const char* log_tag, NSString* format, va_list args);
-inline bool log_verbose_t(const char* log_tag, NSString* format, ...);
-inline bool log_verbose_v(NSString* format, va_list args);
-inline bool log_verbose(NSString* format, ...);
-#endif // defined(__APPLE__) && __OBJC__ == 1
-#else
-inline bool log_verbose_t_v(...) { return true; }
-inline bool log_verbose_t(...)   { return true; }
-inline bool log_verbose_v(...)   { return true; }
-inline bool log_verbose(...)     { return true; }
-#endif // ENABLE_LOG_VERBOSE
-
-#ifdef ENABLE_LOG_DEBUG
-inline void log_debug_t_v(const char* log_tag, const char* format, va_list args);
-inline void log_debug_t(const char* log_tag, const char* format, ...);
-inline void log_debug_v(const char* format, va_list args);
-inline void log_debug(const char* format, ...);
-#if defined(__APPLE__) && __OBJC__ == 1
-inline void log_debug_t_v(const char* log_tag, NSString* format, va_list args);
-inline void log_debug_t(const char* log_tag, NSString* format, ...);
-inline void log_debug_v(NSString* format, va_list args);
-inline void log_debug(NSString* format, ...);
-#endif // defined(__APPLE__) && __OBJC__ == 1
-#else
-inline void log_debug_t_v(...) {}
-inline void log_debug_t(...)   {}
-inline void log_debug_v(...)   {}
-inline void log_debug(...)     {}
-#endif // ENABLE_LOG_DEBUG
-
-inline bool log_disabled_t_v(const char* log_tag, const char* format, va_list args);
-inline bool log_disabled_t(const char* log_tag, const char* format, ...);
-inline bool log_disabled_v(const char* format, va_list args);
-inline bool log_disabled(const char* format, ...);
-#if defined(__APPLE__) && __OBJC__ == 1
-inline bool log_disabled_t_v(const char* log_tag, NSString* format, va_list args);
-inline bool log_disabled_t(const char* log_tag, NSString* format, ...);
-inline bool log_disabled_v(NSString* format, va_list args);
-inline bool log_disabled(NSString* format, ...);
-#endif // defined(__APPLE__) && __OBJC__ == 1
-
-#if !defined(__ANDROID__) && (!defined(WINVER) || WINVER < 0x0602)
-inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int max_frames = 65);
-inline void log_stacktrace(const char* log_tag, unsigned int max_frames = 65);
-inline void log_stacktrace(LC_LogLevel level, unsigned int max_frames = 65);
-inline void log_stacktrace(unsigned int max_frames = 65);
-#endif // !defined(__ANDROID__) && (!defined(WINVER) || WINVER < 0x06020000)
 
 inline std::string lc_current_time();
 
@@ -468,6 +340,107 @@ inline void lc_formatted_printf(FILE* f, LC_LogAttrib attrib, LC_LogColor color,
    VA_LIST_CONTEXT(format, vfprintf(f, final.c_str(), args));
 }
 
+/*------------------------------------------------------------------------------
+|    prepend_location
++-----------------------------------------------------------------------------*/
+inline std::string prepend_location(const char* file, int line, const char* f, const char* format)
+{
+   std::stringstream ss;
+   ss << "[" << basename(const_cast<char*>(file)) << ":" << line << "/" << f << "] " << format;
+   return ss.str();
+}
+
+#if defined(__APPLE__) && __OBJC__ == 1
+/*------------------------------------------------------------------------------
+|    prepend_location
++-----------------------------------------------------------------------------*/
+inline std::string prepend_location(const char* file, int line, const char* f, NSString* format)
+{
+   std::stringstream ss;
+   ss << "[" << basename(const_cast<char*>(file)) << ":";
+   ss << line << "/" << f << "] " << [format cStringUsingEncoding:NSUTF8StringEncoding];
+   return ss.str();
+}
+#endif // defined(__APPLE__) && __OBJC__ == 1
+
+#define log_location_t_v(logfunc, tag, format, args) \
+   (logfunc(tag, prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), args))
+#define log_location_t(logfunc, tag, format, ...) \
+   (logfunc(tag, prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), ##__VA_ARGS__))
+#define log_location_v(logfunc, format, args) \
+   (logfunc(prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), args))
+#define log_location(logfunc, format, ...) \
+   (logfunc(prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), ##__VA_ARGS__))
+
+#ifdef ENABLE_CODE_LOCATION
+#define FUNC(name) f_log_ ##name
+#else
+#define FUNC(name) log_ ##name
+#endif // ENABLE_CODE_LOCATION
+
+#define GENERATE_LEVEL(name, enumname)                                                  \
+   inline bool FUNC(name ##_t_v)(const char* log_tag, const char* format, va_list args) \
+   {                                                                                    \
+      LC_LogDef(log_tag, enumname).printf(format, args);                                \
+      return true;                                                                      \
+   }                                                                                    \
+                                                                                        \
+   inline bool FUNC(name ##_t)(const char* log_tag, const char* format, ...)            \
+   {                                                                                    \
+      VA_LIST_CONTEXT(format, LC_LogDef(log_tag, enumname).printf(format, args));       \
+      return true;                                                                      \
+   }                                                                                    \
+                                                                                        \
+   inline bool FUNC(name ##_v)(const char* format, va_list args)                        \
+   {                                                                                    \
+      LC_LogDef(enumname).printf(format, args);                                         \
+      return true;                                                                      \
+   }                                                                                    \
+   inline bool FUNC(name)(const char* format, ...)                                      \
+   {                                                                                    \
+      VA_LIST_CONTEXT(format, LC_LogDef(enumname).printf(format, args));             \
+      return true;                                                                      \
+   }
+
+#if defined(__APPLE__) && __OBJC__ == 1
+#define GENERATE_LEVEL_OBJC(name, enumname)                                           \
+   inline bool FUNC(name ##_t_v)(const char* log_tag, NSString* format, va_list args) \
+   {                                                                                  \
+      LC_LogDef(log_tag, enumname).printf(format, args);                              \
+      return NO;                                                                      \
+   }                                                                                  \
+                                                                                      \
+   inline bool FUNC(name ##_t)(const char* log_tag, NSString* format, ...)            \
+   {                                                                                  \
+      VA_LIST_CONTEXT(format, LC_LogDef(log_tag, enumname).printf(format, args));     \
+      return NO;                                                                      \
+   }                                                                                  \
+                                                                                      \
+   inline bool FUNC(name ##_v)(NSString* format, va_list args)                        \
+   {                                                                                  \
+      LC_LogDef(enumname).printf(format, args);                                       \
+      return NO;                                                                      \
+   }                                                                                  \
+                                                                                      \
+   inline bool FUNC(name)(NSString* format, ...)                                      \
+   {                                                                                  \
+      VA_LIST_CONTEXT(format, LC_LogDef(enumname).printf(format, args));              \
+      return NO;                                                                      \
+   }
+#else
+#define GENERATE_LEVEL_OBJC(name, enumname)
+#endif // defined(__APPLE__) && __OBJC__ == 1
+
+#define GENERATE_LEVEL_CUSTOM(name, rettype, content)    \
+   inline rettype log_ ##name ##_t_v(...)   {content;}   \
+   inline rettype log_ ##name ##_t(...)     {content;}   \
+   inline rettype log_ ##name ##_v(...)     {content;}   \
+   inline rettype log_ ##name(...)          {content;}   \
+   inline rettype f_log_ ##name ##_t_v(...) {content;}   \
+   inline rettype f_log_ ##name ##_t(...)   {content;}   \
+   inline rettype f_log_ ##name ##_v(...)   {content;}   \
+   inline rettype f_log_ ##name(...)        {content;}
+
 #define log_func \
    log_debug("Entering: %s.", __PRETTY_FUNCTION__)
 #define log_info_func \
@@ -530,11 +503,6 @@ public:
 
    void printf(const char* format, ...);
    void printf(const char* format, va_list args);
-
-#ifdef QT_SQL_LIB
-   void printf(QSqlQuery& query, const char* format, ...);
-   void printf(QSqlQuery& query, const char *format, va_list args);
-#endif // QT_SQL_LIB
 
 #if defined(__APPLE__) && defined(__OBJC__)
    void printf(NSString* format, ...);
@@ -647,269 +615,69 @@ typedef LC_Log<CUSTOM_LOGGER> LC_LogDef;
 #endif // CUSTOM_LOGGER
 
 #ifdef ENABLE_LOG_CRITICAL
-/*------------------------------------------------------------------------------
-|    log_critical_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_critical_t_v(const char* log_tag, const char* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_CRITICAL).printf(format, args);
-   return false;
-}
-
-/*------------------------------------------------------------------------------
-|    log_err_t
-+-----------------------------------------------------------------------------*/
-inline bool log_critical_t(const char* log_tag, const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_CRITICAL).printf(format, args));
-   return false;
-}
-
-/*------------------------------------------------------------------------------
-|    log_err_v
-+-----------------------------------------------------------------------------*/
-inline bool log_critical_v(const char* format, va_list args)
-{
-   LC_LogDef(LC_LOG_CRITICAL).printf(format, args);
-   return false;
-}
-
-/*------------------------------------------------------------------------------
-|    log_err
-+-----------------------------------------------------------------------------*/
-inline bool log_critical(const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_CRITICAL).printf(format, args));
-   return false;
-}
-
-#if defined(__APPLE__) && __OBJC__ == 1
-/*------------------------------------------------------------------------------
-|    log_critical_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_critical_t_v(const char* log_tag, NSString* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_CRITICAL).printf(format, args);
-   return NO;
-}
-
-/*------------------------------------------------------------------------------
-|    log_critical_t
-+-----------------------------------------------------------------------------*/
-inline bool log_critical_t(const char* log_tag, NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_CRITICAL).printf(format, args));
-   return NO;
-}
-
-/*------------------------------------------------------------------------------
-|    log_critical_v
-+-----------------------------------------------------------------------------*/
-inline bool log_critical_v(NSString* format, va_list args)
-{
-   LC_LogDef(LC_LOG_CRITICAL).printf(format, args);
-   return NO;
-}
-
-/*------------------------------------------------------------------------------
-|    log_critical
-+-----------------------------------------------------------------------------*/
-inline bool log_critical(NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_CRITICAL).printf(format, args));
-   return NO;
-}
-#endif // defined(__APPLE__) && __OBJC__ == 1
+GENERATE_LEVEL(critical, LC_LOG_CRITICAL)
+GENERATE_LEVEL_OBJC(critical, LC_LOG_CRITICAL)
+#ifdef ENABLE_CODE_LOCATION
+#define log_critical_t_v(tag, format, args) \
+   log_location_t_v(f_log_critical_t_v, tag, format, args)
+#define log_critical_t(tag, format, ...) \
+   log_location_t(f_log_critical_t, tag, format, ##__VA_ARGS__)
+#define log_critical_v(format, args) \
+   log_location_v(f_log_critical_v, format, args)
+#define log_critical(format, ...) \
+   log_location(f_log_critical, format, ##__VA_ARGS__)
+#endif // ENABLE_CODE_LOCATION
+#else
+GENERATE_LEVEL_CUSTOM(critical, bool, return false)
 #endif // ENABLE_LOG_CRITICAL
 
 #ifdef ENABLE_LOG_ERROR
-/*------------------------------------------------------------------------------
-|    log_err_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_err_t_v(const char* log_tag, const char* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_ERROR).printf(format, args);
-   return false;
-}
-
-/*------------------------------------------------------------------------------
-|    log_err_t
-+-----------------------------------------------------------------------------*/
-inline bool log_err_t(const char* log_tag, const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_ERROR).printf(format, args));
-   return false;
-}
-
-/*------------------------------------------------------------------------------
-|    log_err_v
-+-----------------------------------------------------------------------------*/
-inline bool log_err_v(const char* format, va_list args)
-{
-   LC_LogDef(LC_LOG_ERROR).printf(format, args);
-   return false;
-}
-
-/*------------------------------------------------------------------------------
-|    log_err
-+-----------------------------------------------------------------------------*/
-inline bool log_err(const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_ERROR).printf(format, args));
-   return false;
-}
-
-#if defined(__APPLE__) && __OBJC__ == 1
-/*------------------------------------------------------------------------------
-|    log_err_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_err_t_v(const char* log_tag, NSString* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_ERROR).printf(format, args);
-   return NO;
-}
-
-/*------------------------------------------------------------------------------
-|    log_err_t
-+-----------------------------------------------------------------------------*/
-inline bool log_err_t(const char* log_tag, NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_ERROR).printf(format, args));
-   return NO;
-}
-
-/*------------------------------------------------------------------------------
-|    log_err_v
-+-----------------------------------------------------------------------------*/
-inline bool log_err_v(NSString* format, va_list args)
-{
-   LC_LogDef(LC_LOG_ERROR).printf(format, args);
-   return NO;
-}
-
-/*------------------------------------------------------------------------------
-|    log_critical
-+-----------------------------------------------------------------------------*/
-inline bool log_err(NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_ERROR).printf(format, args));
-   return NO;
-}
-#endif // defined(__APPLE__) && __OBJC__ == 1
+GENERATE_LEVEL(err, LC_LOG_ERROR)
+GENERATE_LEVEL_OBJC(err, LC_LOG_ERROR)
+#ifdef ENABLE_CODE_LOCATION
+#define log_err_t_v(tag, format, args) \
+   log_location_t_v(f_log_err_t_v, tag, format, args)
+#define log_err_t(tag, format, ...) \
+   log_location_t(f_log_err_t, tag, format, ##__VA_ARGS__)
+#define log_err_v(format, args) \
+   log_location_v(f_log_err_v, format, args)
+#define log_err(format, ...) \
+   log_location(f_log_err, format, ##__VA_ARGS__)
+#endif // ENABLE_CODE_LOCATION
+#else
+GENERATE_LEVEL_CUSTOM(err, bool, return false)
 #endif // ENABLE_LOG_ERROR
 
 #ifdef ENABLE_LOG_WARNING
-/*------------------------------------------------------------------------------
-|    log_warn_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_warn_t_v(const char* log_tag, const char* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_WARN).printf(format, args);
-   return false;
-}
-
-/*------------------------------------------------------------------------------
-|    log_warn_t
-+-----------------------------------------------------------------------------*/
-inline bool log_warn_t(const char* log_tag, const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_WARN).printf(format, args));
-   return false;
-}
-
-/*------------------------------------------------------------------------------
-|    log_warn_v
-+-----------------------------------------------------------------------------*/
-inline bool log_warn_v(const char* format, va_list args)
-{
-   LC_LogDef(LC_LOG_WARN).printf(format, args);
-   return false;
-}
-
-/*------------------------------------------------------------------------------
-|    log_warn
-+-----------------------------------------------------------------------------*/
-inline bool log_warn(const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_WARN).printf(format, args));
-   return false;
-}
-
-#if defined(__APPLE__) && __OBJC__ == 1
-/*------------------------------------------------------------------------------
-|    log_critical_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_warn_t_v(const char* log_tag, NSString* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_CRITICAL).printf(format, args);
-   return NO;
-}
-
-/*------------------------------------------------------------------------------
-|    log_critical_t
-+-----------------------------------------------------------------------------*/
-inline bool log_warn_t(const char* log_tag, NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_WARN).printf(format, args));
-   return NO;
-}
-
-/*------------------------------------------------------------------------------
-|    log_critical_v
-+-----------------------------------------------------------------------------*/
-inline bool log_warn_v(NSString* format, va_list args)
-{
-   LC_LogDef(LC_LOG_WARN).printf(format, args);
-   return NO;
-}
-
-/*------------------------------------------------------------------------------
-|    log_critical
-+-----------------------------------------------------------------------------*/
-inline bool log_warn(NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_WARN).printf(format, args));
-   return NO;
-}
-#endif // defined(__APPLE__) && __OBJC__ == 1
+GENERATE_LEVEL(warn, LC_LOG_WARN)
+GENERATE_LEVEL_OBJC(warn, LC_LOG_WARN)
+#ifdef ENABLE_CODE_LOCATION
+#define log_warn_t_v(tag, format, args) \
+   log_location_t_v(f_log_warn_t_v, tag, format, args)
+#define log_warn_t(tag, format, ...) \
+   log_location_t(f_log_warn_t, tag, format, ##__VA_ARGS__)
+#define log_warn_v(format, args) \
+   log_location_v(f_log_warn_v, format, args)
+#define log_warn(format, ...) \
+   log_location(f_log_warn, format, ##__VA_ARGS__)
+#endif // ENABLE_CODE_LOCATION
+#else
+GENERATE_LEVEL_CUSTOM(warn, bool, return false)
 #endif // ENABLE_LOG_WARNING
 
 #ifdef ENABLE_LOG_INFORMATION
-/*------------------------------------------------------------------------------
-|    log_info_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_info_t_v(const char* log_tag, const char* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_INFO).printf(format, args);
-   return true;
-}
-
-/*------------------------------------------------------------------------------
-|    log_info_t
-+-----------------------------------------------------------------------------*/
-inline bool log_info_t(const char* log_tag, const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_INFO).printf(format, args));
-   return true;
-}
-
-/*------------------------------------------------------------------------------
-|    log_info_vs
-+-----------------------------------------------------------------------------*/
-inline bool log_info_v(const char* format, va_list args)
-{
-   LC_LogDef(LC_LOG_INFO).printf(format, args);
-   return true;
-}
-
-/*------------------------------------------------------------------------------
-|    log_info
-+-----------------------------------------------------------------------------*/
-inline bool log_info(const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_INFO).printf(format, args));
-   return true;
-}
+GENERATE_LEVEL(info, LC_LOG_INFO)
+GENERATE_LEVEL_OBJC(info, LC_LOG_INFO)
+#ifdef ENABLE_CODE_LOCATION
+#define log_info_t_v(tag, format, args) \
+   log_location_t_v(f_log_info_t_v, tag, format, args)
+#define log_info_t(tag, format, ...) \
+   log_location_t(f_log_info_t, tag, format, ##__VA_ARGS__)
+#define log_info_v(format, args) \
+   log_location_v(f_log_info_v, format, args)
+#define log_info(format, ...) \
+   log_location(f_log_info, format, ##__VA_ARGS__)
+#endif // ENABLE_CODE_LOCATION
 
 /*------------------------------------------------------------------------------
 |    log_formatted_t
@@ -958,42 +726,6 @@ inline bool log_formatted(LC_LogColor c, const char* format, ...)
 
 #if defined(__APPLE__) && __OBJC__ == 1
 /*------------------------------------------------------------------------------
-|    log_info_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_info_t_v(const char* log_tag, NSString* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_INFO).printf(format, args);
-   return YES;
-}
-
-/*------------------------------------------------------------------------------
-|    log_info_t
-+-----------------------------------------------------------------------------*/
-inline bool log_info_t(const char* log_tag, NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_INFO).printf(format, args));
-   return YES;
-}
-
-/*------------------------------------------------------------------------------
-|    log_info_v
-+-----------------------------------------------------------------------------*/
-inline bool log_info_v(NSString* format, va_list args)
-{
-   LC_LogDef(LC_LOG_INFO).printf(format, args);
-   return YES;
-}
-
-/*------------------------------------------------------------------------------
-|    log_info
-+-----------------------------------------------------------------------------*/
-inline bool log_info(NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_INFO).printf(format, args));
-   return YES;
-}
-
-/*------------------------------------------------------------------------------
 |    log_formatted_t
 +-----------------------------------------------------------------------------*/
 inline bool log_formatted_t(const char* log_tag, LC_LogAttrib a, LC_LogColor c, NSString* format, va_list args)
@@ -1029,195 +761,49 @@ inline bool log_formatted(LC_LogColor c, NSString* format, ...)
    return YES;
 }
 #endif // defined(__APPLE__) && __OBJC__ == 1
+#else
+GENERATE_LEVEL_CUSTOM(info, bool, return true)
+inline bool log_formatted_t_v(...) { return true; }
+inline bool log_formatted_t(...)   { return true; }
+inline bool log_formatted_v(...)   { return true; }
+inline bool log_formatted(...)     { return true; }
 #endif // ENABLE_LOG_INFORMATION
 
 #ifdef ENABLE_LOG_VERBOSE
-/*------------------------------------------------------------------------------
-|    log_verbose_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_verbose_t_v(const char* log_tag, const char* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_VERBOSE).printf(format, args);
-   return true;
-}
-
-/*------------------------------------------------------------------------------
-|    log_verbose_t
-+-----------------------------------------------------------------------------*/
-inline bool log_verbose_t(const char* log_tag, const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_VERBOSE).printf(format, args));
-   return true;
-}
-
-/*------------------------------------------------------------------------------
-|    log_verbose_v
-+-----------------------------------------------------------------------------*/
-inline bool log_verbose_v(const char* format, va_list args)
-{
-   LC_LogDef(LC_LOG_VERBOSE).printf(format, args);
-   return true;
-}
-
-/*------------------------------------------------------------------------------
-|    log_verbose
-+-----------------------------------------------------------------------------*/
-inline bool log_verbose(const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_VERBOSE).printf(format, args));
-   return true;
-}
-
-#if defined(__APPLE__) && __OBJC__ == 1
-/*------------------------------------------------------------------------------
-|    log_verbose_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_verbose_t_v(const char* log_tag, NSString* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_VERBOSE).printf(format, args);
-   return YES;
-}
-
-/*------------------------------------------------------------------------------
-|    log_verbose_t
-+-----------------------------------------------------------------------------*/
-inline bool log_verbose_t(const char* log_tag, NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_VERBOSE).printf(format, args));
-   return YES;
-}
-
-/*------------------------------------------------------------------------------
-|    log_verbose_v
-+-----------------------------------------------------------------------------*/
-inline bool log_verbose_v(NSString* format, va_list args)
-{
-   LC_LogDef(LC_LOG_VERBOSE).printf(format, args);
-   return YES;
-}
-
-/*------------------------------------------------------------------------------
-|    log_verbose
-+-----------------------------------------------------------------------------*/
-inline bool log_verbose(NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_VERBOSE).printf(format, args));
-   return YES;
-}
-#endif // defined(__APPLE__) && __OBJC__ == 1
+GENERATE_LEVEL(verbose, LC_LOG_VERBOSE)
+GENERATE_LEVEL_OBJC(verbose, LC_LOG_VERBOSE)
+#ifdef ENABLE_CODE_LOCATION
+#define log_verbose_t_v(tag, format, args) \
+   log_location_t_v(f_log_verbose_t_v, tag, format, args)
+#define log_verbose_t(tag, format, ...) \
+   log_location_t(f_log_verbose_t, tag, format, ##__VA_ARGS__)
+#define log_verbose_v(format, args) \
+   log_location_v(f_log_verbose_v, format, args)
+#define log_verbose(format, ...) \
+   log_location(f_log_verbose, format, ##__VA_ARGS__)
+#endif // ENABLE_CODE_LOCATION
+#else
+GENERATE_LEVEL_CUSTOM(verbose, bool, return true)
 #endif // ENABLE_LOG_VERBOSE
 
 #ifdef ENABLE_LOG_DEBUG
-/*------------------------------------------------------------------------------
-|    log_debug_t_v
-+-----------------------------------------------------------------------------*/
-inline void log_debug_t_v(const char* log_tag, const char* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_DEBUG).printf(format, args);
-}
-
-/*------------------------------------------------------------------------------
-|    log_debug_t
-+-----------------------------------------------------------------------------*/
-inline void log_debug_t(const char* log_tag, const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_DEBUG).printf(format, args));
-}
-
-/*------------------------------------------------------------------------------
-|    log_debug_v
-+-----------------------------------------------------------------------------*/
-inline void log_debug_v(const char* format, va_list args)
-{
-   LC_LogDef(LC_LOG_DEBUG).printf(format, args);
-}
-
-/*------------------------------------------------------------------------------
-|    log_debug
-+-----------------------------------------------------------------------------*/
-inline void log_debug(const char* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_DEBUG).printf(format, args));
-}
-
-#if defined(__APPLE__) && __OBJC__ == 1
-/*------------------------------------------------------------------------------
-|    log_debug_t_v
-+-----------------------------------------------------------------------------*/
-inline void log_debug_t_v(const char* log_tag, NSString* format, va_list args)
-{
-   LC_LogDef(log_tag, LC_LOG_DEBUG).printf(format, args);
-}
-
-/*------------------------------------------------------------------------------
-|    log_debug_t
-+-----------------------------------------------------------------------------*/
-inline void log_debug_t(const char* log_tag, NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(log_tag, LC_LOG_DEBUG).printf(format, args));
-}
-
-/*------------------------------------------------------------------------------
-|    log_debug_v
-+-----------------------------------------------------------------------------*/
-inline void log_debug_v(NSString* format, va_list args)
-{
-   LC_LogDef(LC_LOG_DEBUG).printf(format, args);
-}
-
-/*------------------------------------------------------------------------------
-|    log_debug
-+-----------------------------------------------------------------------------*/
-inline void log_debug(NSString* format, ...)
-{
-   VA_LIST_CONTEXT(format, LC_LogDef(LC_LOG_DEBUG).printf(format, args));
-}
-#endif // defined(__APPLE__) && __OBJC__ == 1
+GENERATE_LEVEL(debug, LC_LOG_DEBUG)
+GENERATE_LEVEL_OBJC(debug, LC_LOG_DEBUG)
+#ifdef ENABLE_CODE_LOCATION
+#define log_debug_t_v(tag, format, args) \
+   log_location_t_v(f_log_debug_t_v, tag, format, args)
+#define log_debug_t(tag, format, ...) \
+   log_location_t(f_log_debug_t, tag, format, ##__VA_ARGS__)
+#define log_debug_v(format, args) \
+   log_location_v(f_log_debug_v, format, args)
+#define log_debug(format, ...) \
+   log_location(f_log_debug, format, ##__VA_ARGS__)
+#endif // ENABLE_CODE_LOCATION
+#else
+GENERATE_LEVEL_CUSTOM(debug, void, (void)0)
 #endif // ENABLE_LOG_DEBUG
 
-/*------------------------------------------------------------------------------
-|    log_disabled_t_v
-+-----------------------------------------------------------------------------*/
-inline bool log_disabled_t_v(const char* log_tag, const char* format, va_list args)
-{
-   LOG_UNUSED(log_tag);
-   LOG_UNUSED(format);
-   LOG_UNUSED(args);
-
-   return true;
-}
-
-/*------------------------------------------------------------------------------
-|    log_disabled_t
-+-----------------------------------------------------------------------------*/
-inline bool log_disabled_t(const char* log_tag, const char* format, ...)
-{
-   LOG_UNUSED(log_tag);
-   LOG_UNUSED(format);
-
-   return true;
-}
-
-/*------------------------------------------------------------------------------
-|    log_disabled_v
-+-----------------------------------------------------------------------------*/
-inline bool log_disabled_v(const char* format, va_list args)
-{
-   LOG_UNUSED(format);
-   LOG_UNUSED(args);
-
-   return true;
-}
-
-/*------------------------------------------------------------------------------
-|    log_disabled
-+-----------------------------------------------------------------------------*/
-inline bool log_disabled(const char* format, ...)
-{
-   LOG_UNUSED(format);
-
-   return true;
-}
+GENERATE_LEVEL_CUSTOM(disabled, bool, return true)
 
 #if defined(__APPLE__) && __OBJC__ == 1
 /*------------------------------------------------------------------------------
@@ -1494,9 +1080,8 @@ template <typename T> inline LC_Log<T>::LC_Log(const char* log_tag, LC_LogAttrib
 +-----------------------------------------------------------------------------*/
 template <typename T> inline void LC_Log<T>::prependHeader(std::string& s)
 {
-   if (m_level != LC_LOG_NONE)
+   if (LC_LIKELY(m_level != LC_LOG_NONE))
       s.insert(0, toString(m_level) + ": ");
-   //m_string << lc_current_time() << " ";
    s.insert(0, lc_current_time() + " ");
 }
 
@@ -1514,7 +1099,7 @@ template <typename T> inline void LC_Log<T>::prependLogTagIfNeeded(std::string& 
 +-----------------------------------------------------------------------------*/
 template <typename T> inline void LC_Log<T>::printf(const char* format, ...)
 {
-   if (m_level != LC_LOG_NONE) {
+   if (LC_LIKELY(m_level != LC_LOG_NONE)) {
 #ifdef BUILD_LOG_LEVEL_DEBUG
       // Always return a valid stream.
 #elif defined(BUILD_LOG_LEVEL_VERBOSE)
@@ -1543,7 +1128,7 @@ template <typename T> inline void LC_Log<T>::printf(const char* format, ...)
 +-----------------------------------------------------------------------------*/
 template <typename T> inline void LC_Log<T>::printf(const char* format, va_list args)
 {
-   if (m_level != LC_LOG_NONE) {
+   if (LC_LIKELY(m_level != LC_LOG_NONE)) {
 #ifdef BUILD_LOG_LEVEL_DEBUG
       // Always return a valid stream.
 #elif defined(BUILD_LOG_LEVEL_VERBOSE)
@@ -1570,87 +1155,13 @@ template <typename T> inline void LC_Log<T>::printf(const char* format, va_list 
    T::printf(*this, args);
 }
 
-#ifdef QT_SQL_LIB
-/*------------------------------------------------------------------------------
-|    LC_Log<T>::printf
-+-----------------------------------------------------------------------------*/
-template <typename T> inline void LC_Log<T>::printf(QSqlQuery& query, const char* format, ...)
-{
-   if (m_level != LC_LOG_NONE) {
-#ifdef BUILD_LOG_LEVEL_DEBUG
-      // Always return a valid stream.
-#elif defined(BUILD_LOG_LEVEL_VERBOSE)
-      if (m_level > LC_LOG_VERBOSE)
-         return;
-#elif defined(BUILD_LOG_LEVEL_INFORMATION)
-      if (m_level > LC_LOG_INFO)
-         return;
-#elif defined(BUILD_LOG_LEVEL_WARNING)
-      if (m_level > LC_LOG_WARN)
-         return;
-#elif defined(BUILD_LOG_LEVEL_ERROR)
-      if (m_level > LC_LOG_ERROR)
-         return;
-#elif defined(BUILD_LOG_LEVEL_CRITICAL)
-      if (m_level > LC_LOG_CRITICAL)
-         return;
-#endif
-   }
-
-   VA_LIST_CONTEXT(format, printf(query, format, args));
-}
-
-/*------------------------------------------------------------------------------
-|    LC_Log<T>::printf
-+-----------------------------------------------------------------------------*/
-template <typename T> inline void LC_Log<T>::printf(QSqlQuery& query, const char* format, va_list args)
-{
-   if (m_level != LC_LOG_NONE) {
-#ifdef BUILD_LOG_LEVEL_DEBUG
-      // Always return a valid stream.
-#elif defined(BUILD_LOG_LEVEL_VERBOSE)
-      if (m_level > LC_LOG_VERBOSE)
-         return;
-#elif defined(BUILD_LOG_LEVEL_INFORMATION)
-      if (m_level > LC_LOG_INFO)
-         return;
-#elif defined(BUILD_LOG_LEVEL_WARNING)
-      if (m_level > LC_LOG_WARN)
-         return;
-#elif defined(BUILD_LOG_LEVEL_ERROR)
-      if (m_level > LC_LOG_ERROR)
-         return;
-#elif defined(BUILD_LOG_LEVEL_CRITICAL)
-      if (m_level > LC_LOG_CRITICAL)
-         return;
-#endif
-   }
-
-   prependLogTagIfNeeded();
-   prependHeader();
-   m_string << format << std::endl;
-
-   prependLogTagIfNeeded();
-   m_string << "Failed to execute query: " << qPrintable(query.lastQuery()) << "." << std::endl;
-
-   prependLogTagIfNeeded();
-   m_string << "Error description: " << qPrintable(query.lastError().databaseText()) << "." << std::endl;
-
-   prependLogTagIfNeeded();
-   m_string << "Error code: " << query.lastError().number() << "." << std::endl;
-
-   // Delegate.
-   T::printf(*this, args);
-}
-#endif // QT_SQL_LIB
-
 #if defined(__APPLE__) && (__OBJC__ == 1)
 /*------------------------------------------------------------------------------
 |    LC_Log<T>::printf
 +-----------------------------------------------------------------------------*/
 template <typename T> inline void LC_Log<T>::printf(NSString* format, ...)
 {
-   if (m_level != LC_LOG_NONE) {
+   if (LC_LIKELY(m_level != LC_LOG_NONE)) {
 #ifdef BUILD_LOG_LEVEL_DEBUG
       // Always return a valid stream.
 #elif defined(BUILD_LOG_LEVEL_VERBOSE)
@@ -1679,7 +1190,7 @@ template <typename T> inline void LC_Log<T>::printf(NSString* format, ...)
 +-----------------------------------------------------------------------------*/
 template <typename T> inline void LC_Log<T>::printf(NSString* format, va_list args)
 {
-   if (m_level != LC_LOG_NONE) {
+   if (LC_LIKELY(m_level != LC_LOG_NONE)) {
 #ifdef BUILD_LOG_LEVEL_DEBUG
       // Always return a valid stream.
 #elif defined(BUILD_LOG_LEVEL_VERBOSE)
@@ -1718,7 +1229,7 @@ template <typename T> inline void LC_Log<T>::printf(NSString* format, va_list ar
 +-----------------------------------------------------------------------------*/
 template <typename T> inline LC_Log<T>::~LC_Log()
 {
-   if (m_level != LC_LOG_NONE) {
+   if (LC_LIKELY(m_level != LC_LOG_NONE)) {
 #ifdef BUILD_LOG_LEVEL_DEBUG
       // Always return a valid stream.
 #elif defined(BUILD_LOG_LEVEL_VERBOSE)
@@ -1752,7 +1263,7 @@ template <typename T> inline std::ostream& LC_Log<T>::stream()
 {
    static LC_NullStream nullStream;
 
-   if (m_level != LC_LOG_NONE) {
+   if (LC_LIKELY(m_level != LC_LOG_NONE)) {
 #ifdef BUILD_LOG_LEVEL_DEBUG
       // Always return a valid stream.
 #elif defined(BUILD_LOG_LEVEL_VERBOSE)
@@ -1820,7 +1331,7 @@ inline void LC_Output2Std::printf(LC_Log<LC_Output2Std>& logger, va_list args)
 #ifdef COLORING_ENABLED
    LC_LogAttrib attrib;
    LC_LogColor  color;
-   if (logger.m_level != LC_LOG_NONE) {
+   if (LC_LIKELY(logger.m_level != LC_LOG_NONE)) {
       attrib = LC_LOG_ATTR_RESET;
       color = getColorForLevel(logger.m_level);
    }
@@ -2120,27 +1631,27 @@ public:
    }
 
    Q_INVOKABLE void debug(QString s) const {
-      log_debug(qPrintable(s));
+      FUNC(debug)(qPrintable(s));
    }
 
    Q_INVOKABLE bool verbose(QString s) const {
-      return log_verbose(qPrintable(s));
+      return FUNC(verbose)(qPrintable(s));
    }
 
    Q_INVOKABLE bool info(QString s) const {
-      return log_info(qPrintable(s));
+      return FUNC(info)(qPrintable(s));
    }
 
    Q_INVOKABLE bool warn(QString s) const {
-      return log_warn(qPrintable(s));
+      return FUNC(warn)(qPrintable(s));
    }
 
    Q_INVOKABLE bool error(QString s) const {
-      return log_err(qPrintable(s));
+      return FUNC(err)(qPrintable(s));
    }
 
    Q_INVOKABLE bool critical(QString s) const {
-      return log_critical(qPrintable(s));
+      return FUNC(err)(qPrintable(s));
    }
 
    static void registerObject(QQmlContext* context) {
@@ -2185,5 +1696,7 @@ void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s)
 // Prevent from using outside.
 #undef VA_LIST_CONTEXT
 #undef LOG_UNUSED
+#undef LC_LIKELY
+#undef LC_UNLIKELY
 
 #endif // LC_LOGGING_H

@@ -30,7 +30,6 @@
  */
 
 #define XCODE_COLORING_ENABLED
-#define BUILD_LOG_LEVEL_WARNING
 
 #import "LCAppDelegate.h"
 
