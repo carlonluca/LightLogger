@@ -71,6 +71,26 @@ void test_func()
 {
    test_func2(1);
 }
+
+/*------------------------------------------------------------------------------
+|    test_args
++-----------------------------------------------------------------------------*/
+void test_args(const char* format, ...)
+{
+   {
+      va_list args;
+      va_start(args, format);
+      log_info_v(format, args);
+      va_end(args);
+   }
+
+   {
+      va_list args;
+      va_start(args, format);
+      log_info_t_v("MyTag", format, args);
+      va_end(args);
+   }
+}
 #endif
 
 #ifndef __ANDROID__
@@ -113,7 +133,12 @@ int main(int argc, char** argv)
    LOG_CRITICAL("MyTag", "Oooops!");
 #endif
 
+   log_info("Info log.");
+   log_info_t("MyTag", "Info log.");
+   test_args("Testing %d va_args functions.", 2);
+
    log_debug("Some message for debugging...");
+   log_disabled("A disabled log!!!!!!!!!!! You won't see this.");
 
    log_critical("Print int: %d.", 5);
    log_critical_t("MyTag", "Print int: %d.", 5);
