@@ -1679,6 +1679,11 @@ void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s)
    case QtDebugMsg:
       log_verbose("%s", qPrintable(s));
       break;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+	case QtInfoMsg:
+		log_info("%s", qPrintable(s));
+		break;
+#endif
    case QtWarningMsg:
       log_warn("%s", qPrintable(s));
       break;
