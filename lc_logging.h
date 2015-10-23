@@ -378,28 +378,28 @@ inline std::string prepend_location(const char* file, int line, const char* f, N
 #define FUNC(name) log_ ##name
 #endif // ENABLE_CODE_LOCATION
 
-#define GENERATE_LEVEL(name, enumname)                                                  \
+#define GENERATE_LEVEL(name, enumname, retval)                                          \
    inline bool FUNC(name ##_t_v)(const char* log_tag, const char* format, va_list args) \
    {                                                                                    \
       LC_LogDef(log_tag, enumname).printf(format, args);                                \
-      return true;                                                                      \
+		return retval;                                                                    \
    }                                                                                    \
                                                                                         \
    inline bool FUNC(name ##_t)(const char* log_tag, const char* format, ...)            \
    {                                                                                    \
       VA_LIST_CONTEXT(format, LC_LogDef(log_tag, enumname).printf(format, args));       \
-      return true;                                                                      \
+		return retval;                                                                    \
    }                                                                                    \
                                                                                         \
    inline bool FUNC(name ##_v)(const char* format, va_list args)                        \
    {                                                                                    \
       LC_LogDef(enumname).printf(format, args);                                         \
-      return true;                                                                      \
+		return retval;                                                                    \
    }                                                                                    \
    inline bool FUNC(name)(const char* format, ...)                                      \
    {                                                                                    \
-      VA_LIST_CONTEXT(format, LC_LogDef(enumname).printf(format, args));             \
-      return true;                                                                      \
+		VA_LIST_CONTEXT(format, LC_LogDef(enumname).printf(format, args));                \
+		return retval;                                                                    \
    }
 
 #if defined(__APPLE__) && __OBJC__ == 1
@@ -615,7 +615,7 @@ typedef LC_Log<CUSTOM_LOGGER> LC_LogDef;
 #endif // CUSTOM_LOGGER
 
 #ifdef ENABLE_LOG_CRITICAL
-GENERATE_LEVEL(critical, LC_LOG_CRITICAL)
+GENERATE_LEVEL(critical, LC_LOG_CRITICAL, false)
 GENERATE_LEVEL_OBJC(critical, LC_LOG_CRITICAL)
 #ifdef ENABLE_CODE_LOCATION
 #define log_critical_t_v(tag, format, args) \
@@ -632,7 +632,7 @@ GENERATE_LEVEL_CUSTOM(critical, bool, return false)
 #endif // ENABLE_LOG_CRITICAL
 
 #ifdef ENABLE_LOG_ERROR
-GENERATE_LEVEL(err, LC_LOG_ERROR)
+GENERATE_LEVEL(err, LC_LOG_ERROR, false)
 GENERATE_LEVEL_OBJC(err, LC_LOG_ERROR)
 #ifdef ENABLE_CODE_LOCATION
 #define log_err_t_v(tag, format, args) \
@@ -649,7 +649,7 @@ GENERATE_LEVEL_CUSTOM(err, bool, return false)
 #endif // ENABLE_LOG_ERROR
 
 #ifdef ENABLE_LOG_WARNING
-GENERATE_LEVEL(warn, LC_LOG_WARN)
+GENERATE_LEVEL(warn, LC_LOG_WARN, false)
 GENERATE_LEVEL_OBJC(warn, LC_LOG_WARN)
 #ifdef ENABLE_CODE_LOCATION
 #define log_warn_t_v(tag, format, args) \
@@ -666,7 +666,7 @@ GENERATE_LEVEL_CUSTOM(warn, bool, return false)
 #endif // ENABLE_LOG_WARNING
 
 #ifdef ENABLE_LOG_INFORMATION
-GENERATE_LEVEL(info, LC_LOG_INFO)
+GENERATE_LEVEL(info, LC_LOG_INFO, true)
 GENERATE_LEVEL_OBJC(info, LC_LOG_INFO)
 #ifdef ENABLE_CODE_LOCATION
 #define log_info_t_v(tag, format, args) \
@@ -770,7 +770,7 @@ inline bool log_formatted(...)     { return true; }
 #endif // ENABLE_LOG_INFORMATION
 
 #ifdef ENABLE_LOG_VERBOSE
-GENERATE_LEVEL(verbose, LC_LOG_VERBOSE)
+GENERATE_LEVEL(verbose, LC_LOG_VERBOSE, true)
 GENERATE_LEVEL_OBJC(verbose, LC_LOG_VERBOSE)
 #ifdef ENABLE_CODE_LOCATION
 #define log_verbose_t_v(tag, format, args) \
@@ -787,7 +787,7 @@ GENERATE_LEVEL_CUSTOM(verbose, bool, return true)
 #endif // ENABLE_LOG_VERBOSE
 
 #ifdef ENABLE_LOG_DEBUG
-GENERATE_LEVEL(debug, LC_LOG_DEBUG)
+GENERATE_LEVEL(debug, LC_LOG_DEBUG, true)
 GENERATE_LEVEL_OBJC(debug, LC_LOG_DEBUG)
 #ifdef ENABLE_CODE_LOCATION
 #define log_debug_t_v(tag, format, args) \

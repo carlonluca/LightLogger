@@ -183,6 +183,12 @@ int main(int argc, char** argv)
    view.setSource(QUrl("qrc:///main.qml"));
 #endif
 
+   assert(log_verbose("") == true);
+   assert(log_info("") == true);
+   assert(log_warn("") == false);
+   assert(log_err("") == false);
+   assert(log_critical("") == false);
+
    return 0;
 }
 #endif
