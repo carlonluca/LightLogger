@@ -29,8 +29,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WebRTCTools_lc_logging_swift_h
-#define WebRTCTools_lc_logging_swift_h
+#ifndef LC_LOGGING_SW
+#define LC_LOGGING_SW
 
 /*------------------------------------------------------------------------------
  |    definitions
@@ -39,12 +39,12 @@
 extern "C" {
 #endif
    
-   void log_debug_sw(const char* s);
-   BOOL log_verbose_sw(const char* s);
-   BOOL log_info_sw(const char* s);
-   BOOL log_warn_sw(const char* s);
-   BOOL log_err_sw(const char* s);
-   BOOL log_critical_sw(const char* s);
+   void log_debug_sw(NSString* s);
+   BOOL log_verbose_sw(NSString* s);
+   BOOL log_info_sw(NSString* s);
+   BOOL log_warn_sw(NSString* s);
+   BOOL log_err_sw(NSString* s);
+   BOOL log_critical_sw(NSString* s);
    
 #ifdef __cplusplus
 }

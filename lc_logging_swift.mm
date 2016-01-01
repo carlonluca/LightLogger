@@ -35,6 +35,9 @@
 #include "lc_logging.h"
 #include "lc_logging_swift.h"
 
+#import <Foundation/Foundation.h>
+#import <CoreBluetooth/CoreBluetooth.h>
+
 /*------------------------------------------------------------------------------
  |    definitions
  +-----------------------------------------------------------------------------*/
@@ -45,12 +48,12 @@
 extern "C" {
 #endif
    
-   void log_debug_sw(const char* s) {log_debug(s);}
-   BOOL log_verbose_sw(const char* s) {return log_verbose(s);}
-   BOOL log_info_sw(const char* s) {return log_info(s);}
-   BOOL log_warn_sw(const char* s) {return log_warn(s);}
-   BOOL log_err_sw(const char* s) {return log_err(s);}
-   BOOL log_critical_sw(const char* s) {return log_critical(s);}
+   void log_debug_sw(NSString* s) {log_debug(s);}
+   BOOL log_verbose_sw(NSString* s) {return log_verbose(s);}
+   BOOL log_info_sw(NSString* s) {return log_info(s);}
+   BOOL log_warn_sw(NSString* s) {return log_warn(s);}
+   BOOL log_err_sw(NSString* s) {return log_err(s);}
+   BOOL log_critical_sw(NSString* s) {return log_critical(s);}
    
 #ifdef __cplusplus
 }

@@ -1,65 +1,65 @@
 /*
-* Author:  Luca Carlon
-* Company: -
-* Date:    05.12.2011
-*
-* Copyright (c) 2013-2014, Luca Carlon
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-* * Redistributions of source code must retain the above copyright
-* notice, this list of conditions and the following disclaimer.
-* * Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* * Neither the name of the author nor the
-* names of its contributors may be used to endorse or promote products
-* derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Author:  Luca Carlon
+ * Company: -
+ * Date:    05.12.2011
+ *
+ * Copyright (c) 2013-2015, Luca Carlon
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * * Neither the name of the author nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 /**
-* Classes and structures for logging purposes. Tested on Android, iOS, Linux Embedded,
-* Mac OS X, Windows Vista/7/8, Linux.
-*
-* Available conf macros:
-* 1. COLORING_ENABLED: if defined it forces coloring. If not defined, it is defined or
-*    not according to the platform.
-* 2. ENABLE_LOG_*: if defined, it enables the specific log level.
-* 3. BUILD_LOG_LEVEL_*: if defined it enables all the levels with equal or higher
-*    priority:
-*    - BUILD_LOG_LEVEL_DEBUG;
-*    - BUILD_LOG_LEVEL_VERBOSE;
-*    - BUILD_LOG_LEVEL_INFORMATION;
-*    - BUILD_LOG_LEVEL_WARNING;
-*    - BUILD_LOG_LEVEL_ERROR;
-*    - BUILD_LOG_LEVEL_CRITICAL.
-* 4. BUILD_LOG_LEVEL_ALL: enables all the logs.
-* 5. XCODE_COLORING_ENABLED: Enables coloring with XCode coloring format. This also
-*    enables COLORING_ENABLED automatically.
-* 6. CUSTOM_LOG_FILE: path to the log file.
-* 7. ENABLE_CODE_LOCATION: prepends the location in the sources for all the logs.
-*
-* Chaging default logger delegate
-* LC_LogDef is a typedef used in all the convenience functions. By default its value is
-* LC_Log<LC_Output2Std>. To change it to use one of the other delegates or to use a custom
-* defined delegate, just define the macro CUSTOM_LOGGER to the name of the custom
-* delegate to use *before* including this header. Creating a wrapper header may be a good
-* solution to do this in your entire sources.
-*
-* Version: 1.2.0
-*/
+ * Classes and structures for logging purposes. Tested on Android, iOS, Linux Embedded,
+ * Mac OS X, Windows Vista/7/8, Linux.
+ *
+ * Available conf macros:
+ * 1. COLORING_ENABLED: if defined it forces coloring. If not defined, it is defined or
+ *    not according to the platform.
+ * 2. ENABLE_LOG_*: if defined, it enables the specific log level.
+ * 3. BUILD_LOG_LEVEL_*: if defined it enables all the levels with equal or higher
+ *    priority:
+ *    - BUILD_LOG_LEVEL_DEBUG;
+ *    - BUILD_LOG_LEVEL_VERBOSE;
+ *    - BUILD_LOG_LEVEL_INFORMATION;
+ *    - BUILD_LOG_LEVEL_WARNING;
+ *    - BUILD_LOG_LEVEL_ERROR;
+ *    - BUILD_LOG_LEVEL_CRITICAL.
+ * 4. BUILD_LOG_LEVEL_ALL: enables all the logs.
+ * 5. XCODE_COLORING_ENABLED: Enables coloring with XCode coloring format. This also
+ *    enables COLORING_ENABLED automatically.
+ * 6. CUSTOM_LOG_FILE: path to the log file.
+ * 7. ENABLE_CODE_LOCATION: prepends the location in the sources for all the logs.
+ *
+ * Chaging default logger delegate
+ * LC_LogDef is a typedef used in all the convenience functions. By default its value is
+ * LC_Log<LC_Output2Std>. To change it to use one of the other delegates or to use a custom
+ * defined delegate, just define the macro CUSTOM_LOGGER to the name of the custom
+ * delegate to use *before* including this header. Creating a wrapper header may be a good
+ * solution to do this in your entire sources.
+ *
+ * Version: 1.2.0
+ */
 
 #ifndef LC_LOGGING_H
 #define LC_LOGGING_H
@@ -113,9 +113,9 @@
 #endif
 
 #define VA_LIST_CONTEXT(last, i) \
-   {va_list args; va_start(args, last); i; va_end(args); }
+   {va_list args; va_start(args, last); i; va_end(args);}
 #define LOG_UNUSED(x) \
-   (void) x
+   (void)x
 #ifdef __GNUC__
 #define LC_LIKELY(x) \
    __builtin_expect((x), 1)
@@ -268,7 +268,7 @@ inline const NSString* lc_xc_col(const int& index)
       @"fg255,255,255;",
       @"fg0,0,0;"
    };
-   
+
    return LC_XC_COL[index];
 }
 #endif // XCODE_COLORING_ENABLED
@@ -382,50 +382,50 @@ inline std::string prepend_location(const char* file, int line, const char* f, N
    inline bool FUNC(name ##_t_v)(const char* log_tag, const char* format, va_list args) \
    {                                                                                    \
       LC_LogDef(log_tag, enumname).printf(format, args);                                \
-		return retval;                                                                    \
+      return retval;                                                                    \
    }                                                                                    \
                                                                                         \
    inline bool FUNC(name ##_t)(const char* log_tag, const char* format, ...)            \
    {                                                                                    \
       VA_LIST_CONTEXT(format, LC_LogDef(log_tag, enumname).printf(format, args));       \
-		return retval;                                                                    \
+      return retval;                                                                    \
    }                                                                                    \
                                                                                         \
    inline bool FUNC(name ##_v)(const char* format, va_list args)                        \
    {                                                                                    \
       LC_LogDef(enumname).printf(format, args);                                         \
-		return retval;                                                                    \
+      return retval;                                                                    \
    }                                                                                    \
    inline bool FUNC(name)(const char* format, ...)                                      \
    {                                                                                    \
-		VA_LIST_CONTEXT(format, LC_LogDef(enumname).printf(format, args));                \
-		return retval;                                                                    \
+      VA_LIST_CONTEXT(format, LC_LogDef(enumname).printf(format, args));                \
+      return retval;                                                                    \
    }
 
 #if defined(__APPLE__) && __OBJC__ == 1
-#define GENERATE_LEVEL_OBJC(name, enumname)                                           \
+#define GENERATE_LEVEL_OBJC(name, enumname, retval)                                   \
    inline bool FUNC(name ##_t_v)(const char* log_tag, NSString* format, va_list args) \
    {                                                                                  \
       LC_LogDef(log_tag, enumname).printf(format, args);                              \
-      return NO;                                                                      \
+      return retval;                                                                  \
    }                                                                                  \
                                                                                       \
    inline bool FUNC(name ##_t)(const char* log_tag, NSString* format, ...)            \
    {                                                                                  \
       VA_LIST_CONTEXT(format, LC_LogDef(log_tag, enumname).printf(format, args));     \
-      return NO;                                                                      \
+      return retval;                                                                  \
    }                                                                                  \
                                                                                       \
    inline bool FUNC(name ##_v)(NSString* format, va_list args)                        \
    {                                                                                  \
       LC_LogDef(enumname).printf(format, args);                                       \
-      return NO;                                                                      \
+      return retval;                                                                  \
    }                                                                                  \
                                                                                       \
    inline bool FUNC(name)(NSString* format, ...)                                      \
    {                                                                                  \
       VA_LIST_CONTEXT(format, LC_LogDef(enumname).printf(format, args));              \
-      return NO;                                                                      \
+      return retval;                                                                  \
    }
 #else
 #define GENERATE_LEVEL_OBJC(name, enumname)
@@ -453,7 +453,7 @@ inline std::string prepend_location(const char* file, int line, const char* f, N
 // Assertions.
 #ifdef __ANDROID__
 #define LOG_ASSERT(cond, text) \
-{if (!(cond)) __android_log_assert(0, LOG_TAG, text); }
+   {if (!(cond)) __android_log_assert(0, LOG_TAG, text); }
 #else
 #define LOG_ASSERT(cond, text) assert(cond)
 #endif
@@ -616,7 +616,7 @@ typedef LC_Log<CUSTOM_LOGGER> LC_LogDef;
 
 #ifdef ENABLE_LOG_CRITICAL
 GENERATE_LEVEL(critical, LC_LOG_CRITICAL, false)
-GENERATE_LEVEL_OBJC(critical, LC_LOG_CRITICAL)
+GENERATE_LEVEL_OBJC(critical, LC_LOG_CRITICAL, NO)
 #ifdef ENABLE_CODE_LOCATION
 #define log_critical_t_v(tag, format, args) \
    log_location_t_v(f_log_critical_t_v, tag, format, args)
@@ -633,7 +633,7 @@ GENERATE_LEVEL_CUSTOM(critical, bool, return false)
 
 #ifdef ENABLE_LOG_ERROR
 GENERATE_LEVEL(err, LC_LOG_ERROR, false)
-GENERATE_LEVEL_OBJC(err, LC_LOG_ERROR)
+GENERATE_LEVEL_OBJC(err, LC_LOG_ERROR, NO)
 #ifdef ENABLE_CODE_LOCATION
 #define log_err_t_v(tag, format, args) \
    log_location_t_v(f_log_err_t_v, tag, format, args)
@@ -650,7 +650,7 @@ GENERATE_LEVEL_CUSTOM(err, bool, return false)
 
 #ifdef ENABLE_LOG_WARNING
 GENERATE_LEVEL(warn, LC_LOG_WARN, false)
-GENERATE_LEVEL_OBJC(warn, LC_LOG_WARN)
+GENERATE_LEVEL_OBJC(warn, LC_LOG_WARN, NO)
 #ifdef ENABLE_CODE_LOCATION
 #define log_warn_t_v(tag, format, args) \
    log_location_t_v(f_log_warn_t_v, tag, format, args)
@@ -667,7 +667,7 @@ GENERATE_LEVEL_CUSTOM(warn, bool, return false)
 
 #ifdef ENABLE_LOG_INFORMATION
 GENERATE_LEVEL(info, LC_LOG_INFO, true)
-GENERATE_LEVEL_OBJC(info, LC_LOG_INFO)
+GENERATE_LEVEL_OBJC(info, LC_LOG_INFO, YES)
 #ifdef ENABLE_CODE_LOCATION
 #define log_info_t_v(tag, format, args) \
    log_location_t_v(f_log_info_t_v, tag, format, args)
@@ -771,7 +771,7 @@ inline bool log_formatted(...)     { return true; }
 
 #ifdef ENABLE_LOG_VERBOSE
 GENERATE_LEVEL(verbose, LC_LOG_VERBOSE, true)
-GENERATE_LEVEL_OBJC(verbose, LC_LOG_VERBOSE)
+GENERATE_LEVEL_OBJC(verbose, LC_LOG_VERBOSE, YES)
 #ifdef ENABLE_CODE_LOCATION
 #define log_verbose_t_v(tag, format, args) \
    log_location_t_v(f_log_verbose_t_v, tag, format, args)
@@ -788,7 +788,7 @@ GENERATE_LEVEL_CUSTOM(verbose, bool, return true)
 
 #ifdef ENABLE_LOG_DEBUG
 GENERATE_LEVEL(debug, LC_LOG_DEBUG, true)
-GENERATE_LEVEL_OBJC(debug, LC_LOG_DEBUG)
+GENERATE_LEVEL_OBJC(debug, LC_LOG_DEBUG, YES)
 #ifdef ENABLE_CODE_LOCATION
 #define log_debug_t_v(tag, format, args) \
    log_location_t_v(f_log_debug_t_v, tag, format, args)
@@ -1081,7 +1081,7 @@ template <typename T> inline LC_Log<T>::LC_Log(const char* log_tag, LC_LogAttrib
 template <typename T> inline void LC_Log<T>::prependHeader(std::string& s)
 {
    if (LC_LIKELY(m_level != LC_LOG_NONE))
-      s.insert(0, toString(m_level) + ": ");
+      s.insert(0, toString(m_level) + ":\t ");
    s.insert(0, lc_current_time() + " ");
 }
 
@@ -1293,8 +1293,12 @@ template <typename T> inline std::ostream& LC_Log<T>::stream()
 template <typename T> inline std::string LC_Log<T>::toString(LC_LogLevel level)
 {
    static const char* const buffer [] = {
-      "CRITICAL", "ERROR", "WARNING",
-      "INFORMATION", "VERBOSE", "DEBUG"
+       "CRIT",
+       "ERR",
+       "WARN",
+       "INFO",
+       "VERB",
+       "DBG"
    };
 
    return buffer[level];
