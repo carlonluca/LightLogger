@@ -428,7 +428,7 @@ inline std::string prepend_location(const char* file, int line, const char* f, N
       return retval;                                                                  \
    }
 #else
-#define GENERATE_LEVEL_OBJC(name, enumname)
+#define GENERATE_LEVEL_OBJC(name, enumname, retval)
 #endif // defined(__APPLE__) && __OBJC__ == 1
 
 #define GENERATE_LEVEL_CUSTOM(name, rettype, content)    \
