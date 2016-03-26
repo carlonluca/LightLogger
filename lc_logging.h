@@ -800,7 +800,7 @@ GENERATE_LEVEL_OBJC(debug, LC_LOG_DEBUG, YES)
    log_location(f_log_debug, format, ##__VA_ARGS__)
 #endif // ENABLE_CODE_LOCATION
 #else
-GENERATE_LEVEL_CUSTOM(debug, void, (void)0)
+GENERATE_LEVEL_CUSTOM(debug, bool, return true)
 #endif // ENABLE_LOG_DEBUG
 
 GENERATE_LEVEL_CUSTOM(disabled, bool, return true)
