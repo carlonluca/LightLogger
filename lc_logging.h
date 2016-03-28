@@ -1621,6 +1621,44 @@ inline std::string lc_current_time()
 }
 #endif // WIN32
 
+#ifdef QT_CORE_LIB
+#include <QtGlobal>
+#include <QString>
+
+/*------------------------------------------------------------------------------
+|    log_handler
++-----------------------------------------------------------------------------*/
+/**
+ * @brief log_handler Function to handle Qt debugging output.
+ * @param type
+ * @param msg
+ */
+inline
+void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s)
+{
+	switch (type) {
+	case QtDebugMsg:
+		log_verbose("%s", qPrintable(s));
+		break;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+	case QtInfoMsg:
+		log_info("%s", qPrintable(s));
+		break;
+#endif
+	case QtWarningMsg:
+		log_warn("%s", qPrintable(s));
+		break;
+	case QtCriticalMsg:
+		log_err("%s", qPrintable(s));
+		break;
+	case QtFatalMsg:
+		log_critical("%s", qPrintable(s));
+		break;
+	}
+}
+
+#endif // QT_CORE_LIB
+
 #ifdef QT_QML_LIB
 /*------------------------------------------------------------------------------
 |    LC_QMLLogger
@@ -1666,41 +1704,6 @@ private:
    LC_QMLLogger() : QObject() {}
 };
 #endif // QT_QML_LIB
-
-#ifdef QT_CORE_LIB
-/*------------------------------------------------------------------------------
-|    log_handler
-+-----------------------------------------------------------------------------*/
-/**
- * @brief log_handler Function to handle Qt debugging output.
- * @param type
- * @param msg
- */
-inline
-void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s)
-{
-   switch (type) {
-   case QtDebugMsg:
-      log_verbose("%s", qPrintable(s));
-      break;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-	case QtInfoMsg:
-		log_info("%s", qPrintable(s));
-		break;
-#endif
-   case QtWarningMsg:
-      log_warn("%s", qPrintable(s));
-      break;
-   case QtCriticalMsg:
-      log_err("%s", qPrintable(s));
-      break;
-   case QtFatalMsg:
-      log_critical("%s", qPrintable(s));
-      break;
-   }
-}
-
-#endif // QT_CORE_LIB
 
 // Prevent from using outside.
 #undef VA_LIST_CONTEXT
