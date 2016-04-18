@@ -74,7 +74,9 @@
 #include <cstring>
 #include <iostream>
 #include <cstdlib>
+#if !defined(_WIN32) && !defined(_WIN32_WCE)
 #include <libgen.h>
+#endif
 #if !defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__ANDROID__)
 #include <unistd.h>
 #include <execinfo.h>
@@ -121,6 +123,9 @@
    __builtin_expect((x), 1)
 #define LC_UNLIKELY(x) \
    __builtin_expect((x), 0)
+#else
+#define LC_LIKELY(x) (x)
+#define LC_UNLIKELY(x) (x)
 #endif // __GNUC__
 
 // Coloring is automatically enabled if XCODE_COLORING_ENABLED is defined.
@@ -346,7 +351,18 @@ inline void lc_formatted_printf(FILE* f, LC_LogAttrib attrib, LC_LogColor color,
 inline std::string prepend_location(const char* file, int line, const char* f, const char* format)
 {
    std::stringstream ss;
-   ss << "[" << basename(const_cast<char*>(file)) << ":" << line << "/" << f << "] " << format;
+#ifndef _WIN32
+	ss << "[" << basename(const_cast<char*>(file));
+#else
+	static char fname[_MAX_FNAME];
+	static char ext[_MAX_EXT];
+	if (0 != _splitpath_s(file, NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT))
+		ss << "[" << "-";
+	else
+		ss << "[" << fname << ext;
+#endif // _WIN32
+
+	ss << ":" << line << "/" << f << "] " << format;
    return ss.str();
 }
 
@@ -1593,7 +1609,7 @@ inline std::string lc_current_time()
 #ifndef _MSC_VER
    sprintf(result, "%s.%03ld", buffer, (long) (GetTickCount() - first) % 1000);
 #else
-   sprintf_s(result, sizeof(result), "%ls.%03lld", (const char*) buffer, (ULONGLONG) (GetTickCount64() - first) % 1000);
+	sprintf_s(result, sizeof(result), "%s.%03lld", (const char*) buffer, (ULONGLONG) (GetTickCount64() - first) % 1000);
 #endif
    return result;
 }
