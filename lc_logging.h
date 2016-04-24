@@ -1721,14 +1721,15 @@ private:
 };
 #endif // QT_QML_LIB
 
-#if __cplusplus >= 201103L
+// __cplusplus in VS2015 is still terribly old. So check for the damn
+// VS compiler separately.
+#if __cplusplus >= 201103L || _MSC_VER >= 1800
+#include <mutex>
 static std::once_flag log_info_once_flag;
-
 #define log_info_once(...) \
 	std::call_once(log_info_once_flag, []() { \
 		log_info(__VA_ARGS__); \
 	});
-
 #endif
 
 // Prevent from using outside.
