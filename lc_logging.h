@@ -1721,6 +1721,16 @@ private:
 };
 #endif // QT_QML_LIB
 
+#if __cplusplus >= 201103L
+static std::once_flag log_info_once_flag;
+
+#define log_info_once(...) \
+	std::call_once(log_info_once_flag, []() { \
+		log_info(__VA_ARGS__); \
+	});
+
+#endif
+
 // Prevent from using outside.
 #undef VA_LIST_CONTEXT
 #undef LOG_UNUSED
