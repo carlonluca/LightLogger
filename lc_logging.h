@@ -74,6 +74,7 @@
 #include <cstring>
 #include <iostream>
 #include <cstdlib>
+#include <ctime>
 #if !defined(_WIN32) && !defined(_WIN32_WCE)
 #include <libgen.h>
 #endif
@@ -1611,9 +1612,9 @@ inline int gettimeofday(struct timeval * tp, struct timezone * tzp)
     tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
     return 0;
 }
+#else
+#include <sys/time.h>
 #endif // WIN32
-
-#include <ctime>
 
 /*------------------------------------------------------------------------------
 |    lc_current_time
