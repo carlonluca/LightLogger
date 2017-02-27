@@ -1591,30 +1591,29 @@ inline NSString* LC_Output2XCodeColors::getColorForLevel(LC_LogLevel level)
 #endif // XCODE_COLORING_ENABLED
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-/*------------------------------------------------------------------------------
-|    current_time
-+----------------------------------------------------------------------------*/
-inline std::string lc_current_time()
+inline int gettimeofday(struct timeval * tp, struct timezone * tzp)
 {
-   const int MAX_LEN = 200;
-   wchar_t buffer[MAX_LEN];
+    // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
+    // This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
+    // until 00:00:00 January 1, 1970
+    static const uint64_t EPOCH = ((uint64_t) 116444736000000000ULL);
 
-   // Get locale name. GetTimeFormatEx should be supported since Windows 7.
-   if (GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, 0, 0, L"HH':'mm':'ss", buffer, MAX_LEN) == 0)
-      return "Error in NowTime()";
+    SYSTEMTIME  system_time;
+    FILETIME    file_time;
+    uint64_t    time;
 
-   // GetTickTime64() should be supported since Windows Vista.
-   char result[100] = { 0 };
-   static ULONGLONG first = GetTickCount64();
-#ifndef _MSC_VER
-   sprintf(result, "%s.%03ld", buffer, (long) (GetTickCount() - first) % 1000);
-#else
-	sprintf_s(result, sizeof(result), "%s.%03lld", (const char*) buffer, (ULONGLONG) (GetTickCount64() - first) % 1000);
-#endif
-   return result;
+    GetSystemTime( &system_time );
+    SystemTimeToFileTime( &system_time, &file_time );
+    time =  ((uint64_t)file_time.dwLowDateTime )      ;
+    time += ((uint64_t)file_time.dwHighDateTime) << 32;
+
+    tp->tv_sec  = (long) ((time - EPOCH) / 10000000L);
+    tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
+    return 0;
 }
-#else
-#include <sys/time.h>
+#endif // WIN32
+
+#include <ctime>
 
 /*------------------------------------------------------------------------------
 |    lc_current_time
@@ -1635,7 +1634,6 @@ inline std::string lc_current_time()
 
    return result;
 }
-#endif // WIN32
 
 #ifdef QT_CORE_LIB
 #include <QtGlobal>
