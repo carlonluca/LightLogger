@@ -199,6 +199,8 @@
 #define ENABLE_LOG_DEBUG
 #endif // BUILD_LOG_LEVEL_ALL
 
+namespace lightlogger {
+
 /*------------------------------------------------------------------------------
 |    definitions
 +-----------------------------------------------------------------------------*/
@@ -1719,6 +1721,8 @@ private:
    LC_QMLLogger() : QObject() {}
 };
 #endif // QT_QML_LIB
+
+}
 
 // __cplusplus in VS2015 is still terribly old. So check for the damn
 // VS compiler separately.
