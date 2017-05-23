@@ -84,6 +84,7 @@
 #include <cxxabi.h>
 #elif defined(_WIN32) || defined(_WIN32_WCE)
 #include <Windows.h>
+#include <winsock.h>
 #if WINVER < 0x0602
 // It seems Windows 8.1 does not support DbgHelp yet.
 #include <DbgHelp.h>
@@ -1594,7 +1595,7 @@ inline NSString* LC_Output2XCodeColors::getColorForLevel(LC_LogLevel level)
 #endif // XCODE_COLORING_ENABLED
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-inline int gettimeofday(struct timeval * tp, struct timezone * tzp)
+inline int gettimeofday(struct ::timeval * tp, struct timezone * tzp)
 {
     // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
     // This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
