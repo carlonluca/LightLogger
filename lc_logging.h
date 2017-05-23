@@ -1597,6 +1597,8 @@ inline NSString* LC_Output2XCodeColors::getColorForLevel(LC_LogLevel level)
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 inline int gettimeofday(struct ::timeval * tp, struct timezone * tzp)
 {
+    (void)tzp;
+
     // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
     // This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
     // until 00:00:00 January 1, 1970
