@@ -461,15 +461,6 @@ inline std::string prepend_location(const char* file, int line, const char* f, N
    inline rettype f_log_ ##name ##_v(...)   {content;}   \
    inline rettype f_log_ ##name(...)        {content;}
 
-#define log_func \
-   log_debug("Entering: %s.", __PRETTY_FUNCTION__)
-#define log_info_func \
-   log_info("Entering: %s.", __PRETTY_FUNCTION__)
-#define log_verbose_func \
-   log_verbose("Entering: %s.", __PRETTY_FUNCTION__)
-#define log_debug_func \
-   log_debug("Entering: %s.", __PRETTY_FUNCTION__)
-
 // Assertions.
 #ifdef __ANDROID__
 #define LOG_ASSERT(cond, text) \
@@ -886,6 +877,15 @@ inline bool log_disabled(NSString* format, ...)
 #define LOG_DEBUG(tag, f, ...) \
    log_debug_t(tag, f, ##__VA_ARGS__)
 #endif
+
+#define log_func \
+   lightlogger::log_debug("Entering: %s.", __PRETTY_FUNCTION__)
+#define log_info_func \
+   lightlogger::log_info("Entering: %s.", __PRETTY_FUNCTION__)
+#define log_verbose_func \
+   lightlogger::log_verbose("Entering: %s.", __PRETTY_FUNCTION__)
+#define log_debug_func \
+   lightlogger::log_debug("Entering: %s.", __PRETTY_FUNCTION__)
 
 #if !defined(__ANDROID__) && (!defined(WINVER) || WINVER < 0x0602)
 /* Unfortunately backtrace() is not supported by Bionic */
