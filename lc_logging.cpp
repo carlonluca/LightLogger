@@ -64,6 +64,8 @@
 /*------------------------------------------------------------------------------
 |    includes
 +-----------------------------------------------------------------------------*/
+#include "lc_logging.h"
+
 #include <sstream>
 #include <string>
 #include <cstdio>
@@ -166,7 +168,7 @@
 #define ENABLE_LOG_DEBUG
 #endif // BUILD_LOG_LEVEL_ALL
 
-namespace lightlogger {
+using namespace lightlogger;
 
 #ifdef XCODE_COLORING_ENABLED
 /*------------------------------------------------------------------------------
@@ -1423,7 +1425,6 @@ inline std::string lc_current_time()
  * @param type
  * @param msg
  */
-inline
 void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s)
 {
 	switch (type) {
@@ -1450,52 +1451,41 @@ void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s)
 #endif // QT_CORE_LIB
 
 #ifdef QT_QML_LIB
-/*------------------------------------------------------------------------------
-|    LC_QMLLogger
-+-----------------------------------------------------------------------------*/
-class LC_QMLLogger : public QObject
+LC_QMLLogger& LC_QMLLogger::instance()
 {
-   Q_OBJECT
-public:
-   static LC_QMLLogger& instance() {
-      static LC_QMLLogger instance;
-      return instance;
-   }
-
-   Q_INVOKABLE void debug(QString s) const {
-      FUNC(debug)(qPrintable(s));
-   }
-
-   Q_INVOKABLE bool verbose(QString s) const {
-      return FUNC(verbose)(qPrintable(s));
-   }
-
-   Q_INVOKABLE bool info(QString s) const {
-      return FUNC(info)(qPrintable(s));
-   }
-
-   Q_INVOKABLE bool warn(QString s) const {
-      return FUNC(warn)(qPrintable(s));
-   }
-
-   Q_INVOKABLE bool error(QString s) const {
-      return FUNC(err)(qPrintable(s));
-   }
-
-   Q_INVOKABLE bool critical(QString s) const {
-      return FUNC(err)(qPrintable(s));
-   }
-
-   static void registerObject(QQmlContext* context) {
-      context->setContextProperty(QStringLiteral("logger"), &(instance()));
-   }
-
-private:
-   LC_QMLLogger() : QObject() {}
-};
-#endif // QT_QML_LIB
-
+    static LC_QMLLogger instance;
+    return instance;
 }
+
+void LC_QMLLogger::debug(QString s) const {
+    FUNC(debug)(qPrintable(s));
+}
+
+bool LC_QMLLogger::verbose(QString s) const {
+    return FUNC(verbose)(qPrintable(s));
+}
+
+bool LC_QMLLogger::info(QString s) const {
+    return FUNC(info)(qPrintable(s));
+}
+
+bool LC_QMLLogger::warn(QString s) const {
+    return FUNC(warn)(qPrintable(s));
+}
+
+bool LC_QMLLogger::error(QString s) const {
+    return FUNC(err)(qPrintable(s));
+}
+
+bool LC_QMLLogger::critical(QString s) const {
+    return FUNC(err)(qPrintable(s));
+}
+
+void LC_QMLLogger::registerObject(QQmlContext* context)
+{
+    context->setContextProperty(QStringLiteral("logger"), &(instance()));
+}
+#endif // QT_QML_LIB
 
 // __cplusplus in VS2015 is still terribly old. So check for the damn
 // VS compiler separately.

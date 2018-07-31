@@ -41,7 +41,31 @@
 #endif
 #endif
 
+// Create the logger
+// =================
 #include "lc_logging.h"
+
+using namespace lightlogger;
+
+/*------------------------------------------------------------------------------
+|    LC_Output2Std class
++-----------------------------------------------------------------------------*/
+class LC_OutputHello
+{
+public:
+    static void printf(LC_Log<LC_OutputHello>& logger, va_list args) {
+        qDebug("HELLO");
+    }
+
+    static LC_LogColor getColorForLevel(LC_LogLevel level) {
+        return LC_LOG_COL_MAGENTA;
+    }
+};
+
+#define CUSTOM_LOGGER LC_OutputHello
+
+#include "lc_logging.cpp"
+// =================
 
 #ifdef __ANDROID__
 #include <jni.h>
@@ -155,10 +179,10 @@ int main(int argc, char** argv)
 
    // Using streams.
    {
-      LC_LogDef logger(NULL, LC_LOG_ATTR_RESET, LC_LOG_COL_BLUE);
+      LC_LogDef logger(nullptr, LC_LOG_ATTR_RESET, LC_LOG_COL_BLUE);
       logger.stream() << "Blue log using stream. " << "Params can be added like " << 1234 << ".";
 
-      LC_LogDef l(NULL);
+      LC_LogDef l(nullptr);
       Q_UNUSED(l);
    }
 

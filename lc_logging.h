@@ -65,6 +65,14 @@
 #define LOG_TAG NULL
 #endif
 
+#ifdef QT_CORE_LIB
+#include <QObject>
+#include <QString>
+#ifdef QT_QML_LIB
+#include <QQmlContext>
+#endif // QT_QML_LIB
+#endif // QT_CORE_LIB
+
 namespace lightlogger {
 
 /*------------------------------------------------------------------------------
@@ -263,6 +271,42 @@ public:
 typedef LC_Log<LC_Output2XCodeColors> LC_LogXCodeColors;
 #endif
 
+#ifdef QT_CORE_LIB
+/*------------------------------------------------------------------------------
+|    log_handler
++-----------------------------------------------------------------------------*/
+/**
+ * @brief log_handler Function to handle Qt debugging output.
+ * @param type
+ * @param msg
+ */
+void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s);
+
+#ifdef QT_QML_LIB
+/*------------------------------------------------------------------------------
+|    LC_QMLLogger
++-----------------------------------------------------------------------------*/
+class LC_QMLLogger : public QObject
+{
+   Q_OBJECT
+public:
+   static LC_QMLLogger& instance();
+   static void registerObject(QQmlContext* context);
+
+   Q_INVOKABLE void debug(QString s) const;
+   Q_INVOKABLE bool verbose(QString s) const;
+   Q_INVOKABLE bool info(QString s) const;
+   Q_INVOKABLE bool warn(QString s) const;
+   Q_INVOKABLE bool error(QString s) const;
+   Q_INVOKABLE bool critical(QString s) const;
+
+private:
+   LC_QMLLogger() : QObject() {}
+   virtual ~LC_QMLLogger() {}
+};
+#endif // QT_QML_LIB
+#endif // QT_CORE_LIB
+
 }
 
-#endif
+#endif // LC_LOGGING

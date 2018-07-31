@@ -18,7 +18,7 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-SOURCES  += main.cpp
+SOURCES  += main.cpp lc_logging.cpp
 HEADERS  += lc_logging.h
 
 DEFINES  += BUILD_LOG_LEVEL_INFORMATION ENABLE_CODE_LOCATION
