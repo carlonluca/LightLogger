@@ -398,6 +398,8 @@ inline std::string prepend_location(const char* file, int line, const char* f, N
 #define FUNC(name) log_ ##name
 #endif // ENABLE_CODE_LOCATION
 
+#define SHOW(name) show_ ##name
+
 #define GENERATE_LEVEL(name, enumname, retval)                                          \
    inline bool FUNC(name ##_t_v)(const char* log_tag, const char* format, va_list args) \
    {                                                                                    \
@@ -419,6 +421,28 @@ inline std::string prepend_location(const char* file, int line, const char* f, N
    inline bool FUNC(name)(const char* format, ...)                                      \
    {                                                                                    \
       VA_LIST_CONTEXT(format, LC_LogDef(enumname).printf(format, args));                \
+      return retval;                                                                    \
+   }                                                                                    \
+   inline bool SHOW(name ##_t_v)(const char* log_tag, const char* format, va_list args) \
+   {                                                                                    \
+      LC_LogDef(log_tag, enumname, false).printf(format, args);                         \
+      return retval;                                                                    \
+   }                                                                                    \
+                                                                                        \
+   inline bool SHOW(name ##_t)(const char* log_tag, const char* format, ...)            \
+   {                                                                                    \
+      VA_LIST_CONTEXT(format, LC_LogDef(log_tag, enumname, false).printf(format, args));\
+      return retval;                                                                    \
+   }                                                                                    \
+                                                                                        \
+   inline bool SHOW(name ##_v)(const char* format, va_list args)                        \
+   {                                                                                    \
+      LC_LogDef(enumname, false).printf(format, args);                                  \
+      return retval;                                                                    \
+   }                                                                                    \
+   inline bool SHOW(name)(const char* format, ...)                                      \
+   {                                                                                    \
+      VA_LIST_CONTEXT(format, LC_LogDef(enumname, false).printf(format, args));         \
       return retval;                                                                    \
    }
 
@@ -502,11 +526,11 @@ template <typename T>
 class LC_Log
 {
 public:
-   LC_Log(LC_LogLevel level);
-   LC_Log(LC_LogColor color);
-   LC_Log(const char* log_tag);
-   LC_Log(const char* log_tag, LC_LogLevel level);
-   LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor color);
+   LC_Log(LC_LogLevel level, bool nl = true);
+   LC_Log(LC_LogColor color, bool nl = true);
+   LC_Log(const char* log_tag, bool nl = true);
+   LC_Log(const char* log_tag, LC_LogLevel level, bool nl = true);
+   LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor color, bool nl = true);
 
    ~LC_Log();
 
@@ -534,6 +558,7 @@ public:
    const char* m_log_tag;
    LC_LogAttrib m_attrib;
    LC_LogColor m_color;
+   bool m_nl;
 
 private:
    LC_Log(const LC_Log&);
@@ -1044,11 +1069,12 @@ inline void log_stacktrace(const char* log_tag, unsigned int max_frames)
 /*------------------------------------------------------------------------------
 |    LC_Log<T>::LC_Log
 +-----------------------------------------------------------------------------*/
-template <typename T> inline LC_Log<T>::LC_Log(LC_LogColor color) :
+template <typename T> inline LC_Log<T>::LC_Log(LC_LogColor color, bool nl) :
    m_level(LC_LOG_NONE)
    , m_log_tag(LOG_TAG)
    , m_attrib(LC_LOG_ATTR_RESET)
    , m_color(color)
+ , m_nl(nl)
 {
    // Do nothing.
 }
@@ -1056,9 +1082,10 @@ template <typename T> inline LC_Log<T>::LC_Log(LC_LogColor color) :
 /*------------------------------------------------------------------------------
 |    LC_Log<T>::LC_Log
 +-----------------------------------------------------------------------------*/
-template <typename T> inline LC_Log<T>::LC_Log(const char* log_tag, LC_LogLevel level) :
+template <typename T> inline LC_Log<T>::LC_Log(const char* log_tag, LC_LogLevel level, bool nl) :
    m_level(level)
    , m_log_tag(log_tag)
+ , m_nl(nl)
 {
    // Do nothing.
 }
@@ -1066,9 +1093,10 @@ template <typename T> inline LC_Log<T>::LC_Log(const char* log_tag, LC_LogLevel 
 /*------------------------------------------------------------------------------
 |    LC_Log<T>::LC_Log
 +-----------------------------------------------------------------------------*/
-template <typename T> inline LC_Log<T>::LC_Log(const char *log_tag) :
+template <typename T> inline LC_Log<T>::LC_Log(const char *log_tag, bool nl) :
    m_level(LC_LOG_INFO)
    , m_log_tag(log_tag)
+ , m_nl(nl)
 {
    // Do nothing.
 }
@@ -1076,9 +1104,10 @@ template <typename T> inline LC_Log<T>::LC_Log(const char *log_tag) :
 /*------------------------------------------------------------------------------
 |    LC_Log<T>::LC_Log
 +-----------------------------------------------------------------------------*/
-template <typename T> inline LC_Log<T>::LC_Log(LC_LogLevel level) :
+template <typename T> inline LC_Log<T>::LC_Log(LC_LogLevel level, bool nl) :
    m_level(level)
    , m_log_tag(LOG_TAG)
+ , m_nl(nl)
 {
    // Do nothing.
 }
@@ -1086,11 +1115,12 @@ template <typename T> inline LC_Log<T>::LC_Log(LC_LogLevel level) :
 /*------------------------------------------------------------------------------
 |    LC_Log<T>::LC_Log
 +-----------------------------------------------------------------------------*/
-template <typename T> inline LC_Log<T>::LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor color) :
+template <typename T> inline LC_Log<T>::LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor color, bool nl) :
    m_level(LC_LOG_NONE)
    , m_log_tag(log_tag)
    , m_attrib(attrib)
    , m_color(color)
+ , m_nl(nl)
 {
    // Do nothing.
 }
@@ -1370,11 +1400,15 @@ inline void LC_Output2Std::printf(LC_Log<LC_Output2Std>& logger, va_list args)
       << (int) (color + 30) << "m";
    sink << logger.m_string.str();
    sink << (char) 0x1B
-      << "[" << (int) LC_LOG_ATTR_RESET << "m" << std::endl;
+      << "[" << (int) LC_LOG_ATTR_RESET << "m";
+   if (LC_LIKELY(logger.m_nl))
+       sink << std::endl;
    std::string final = sink.str();
 #else
    std::stringstream s;
-   s << logger.m_string.str() << std::endl;
+   s << logger.m_string.str();
+   if (logger.m_nl)
+      s << std::endl;
    std::string final = s.str();
 #endif // COLORING_ENABLED
 
