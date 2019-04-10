@@ -68,6 +68,7 @@
 #ifdef QT_CORE_LIB
 #include <QObject>
 #include <QString>
+#include <QDebug>
 #ifdef QT_QML_LIB
 #include <QQmlContext>
 #endif // QT_QML_LIB
@@ -275,12 +276,11 @@ typedef LC_Log<LC_Output2XCodeColors> LC_LogXCodeColors;
 /*------------------------------------------------------------------------------
 |    log_handler
 +-----------------------------------------------------------------------------*/
-/**
- * @brief log_handler Function to handle Qt debugging output.
- * @param type
- * @param msg
- */
-void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s);
+#if QT_VERSION >= 0x050000
+extern void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s);
+#else
+extern "C" void log_handler(QtMsgType type, const char* s);
+#endif
 
 #ifdef QT_QML_LIB
 /*------------------------------------------------------------------------------

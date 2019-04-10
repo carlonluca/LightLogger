@@ -79,7 +79,9 @@
 #endif
 #if !defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__ANDROID__)
 #include <unistd.h>
+#ifndef __UCLIBC__
 #include <execinfo.h>
+#endif
 #include <cxxabi.h>
 #elif defined(_WIN32) || defined(_WIN32_WCE)
 #include <Windows.h>
@@ -662,7 +664,7 @@ inline bool log_disabled(NSString* format, ...)
 #if !defined(__ANDROID__) && (!defined(WINVER) || WINVER < 0x0602)
 /* Unfortunately backtrace() is not supported by Bionic */
 
-#if !defined(_WIN32) && !defined(_WIN32_WCE)
+#if !defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__UCLIBC__)
 /*------------------------------------------------------------------------------
 |    log_stacktrace
 +-----------------------------------------------------------------------------*/
@@ -751,7 +753,9 @@ inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int 
    free(funcname);
    free(symbollist);
 }
-#else
+#define STACKTRACE_AVAILABLE
+
+#elif defined(_WIN32) || defined(_WIN32_WCE)
 /*------------------------------------------------------------------------------
 |    log_stacktrace
 +-----------------------------------------------------------------------------*/
@@ -786,8 +790,11 @@ inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int 
    free(symbol);
    free(stack);
 }
-#endif // !defined(_WIN32) && !defined(_WIN32_WCE)
+#define STACKTRACE_AVAILABLE
 
+#endif
+
+#ifdef STACKTRACE_AVAILABLE
 /*------------------------------------------------------------------------------
 |    log_stacktrace
 +-----------------------------------------------------------------------------*/
@@ -811,6 +818,7 @@ inline void log_stacktrace(const char* log_tag, unsigned int max_frames)
 {
    log_stacktrace(log_tag, LC_LOG_DEBUG, max_frames);
 }
+#endif // STACKTRACE_AVAILABLE
 #endif // !defined(__ANDROID__) && (!defined(WINVER) || WINVER < 0x0602)
 
 /*------------------------------------------------------------------------------
@@ -1425,25 +1433,35 @@ inline std::string lc_current_time()
  * @param type
  * @param msg
  */
+#if QT_VERSION >= 0x050000
 void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s)
+#else
+extern "C" void log_handler(QtMsgType type, const char* s)
+#endif
 {
+#if QT_VERSION >= 0x050000
+#define TO_ARGS(s) "%s", qPrintable(s)
+#else
+#define TO_ARGS(s) s
+#endif
+
 	switch (type) {
 	case QtDebugMsg:
-		log_verbose("%s", qPrintable(s));
-		break;
+        log_verbose(TO_ARGS(s));
+        break;
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
 	case QtInfoMsg:
-		log_info("%s", qPrintable(s));
-		break;
+        log_info(TO_ARGS(s));
+        break;
 #endif
 	case QtWarningMsg:
-		log_warn("%s", qPrintable(s));
+        log_warn(TO_ARGS(s));
 		break;
 	case QtCriticalMsg:
-		log_err("%s", qPrintable(s));
+        log_err(TO_ARGS(s));
 		break;
 	case QtFatalMsg:
-		log_critical("%s", qPrintable(s));
+        log_critical(TO_ARGS(s));
 		break;
 	}
 }
