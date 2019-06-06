@@ -170,7 +170,7 @@
 #define ENABLE_LOG_DEBUG
 #endif // BUILD_LOG_LEVEL_ALL
 
-using namespace lightlogger;
+namespace lightlogger {
 
 #ifdef XCODE_COLORING_ENABLED
 /*------------------------------------------------------------------------------
@@ -1515,6 +1515,8 @@ static std::once_flag log_info_once_flag;
 		log_info(__VA_ARGS__); \
 	});
 #endif
+
+}
 
 // Prevent from using outside.
 #undef VA_LIST_CONTEXT
