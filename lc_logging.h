@@ -50,6 +50,8 @@
  *    enables COLORING_ENABLED automatically.
  * 6. CUSTOM_LOG_FILE: path to the log file.
  * 7. ENABLE_CODE_LOCATION: prepends the location in the sources for all the logs.
+ * 8. LOG_TAG: tag to be used when printing logs (on Android this is the tag used by
+ *    logcat).
  *
  * Chaging default logger delegate
  * LC_LogDef is a typedef used in all the convenience functions. By default its value is
