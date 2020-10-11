@@ -85,8 +85,8 @@
 #include <execinfo.h>
 #include <cxxabi.h>
 #elif defined(_WIN32) || defined(_WIN32_WCE)
+#include <WinSock2.h>
 #include <Windows.h>
-#include <winsock.h>
 #if WINVER < 0x0602
 // It seems Windows 8.1 does not support DbgHelp yet.
 #include <DbgHelp.h>
