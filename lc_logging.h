@@ -1535,8 +1535,9 @@ inline void LC_OutputAndroid::printf(LC_Log<LC_OutputAndroid>& logger, va_list a
       ANDROID_LOG_DEBUG
    };
 
+   android_LogPriority p = (logger.m_level > 5 || logger.m_level < 0) ? ANDROID_LOG_INFO : android_logPriority[logger.m_level];
    __android_log_vprint(
-      android_logPriority[logger.m_level],
+      p,
       logger.m_log_tag,
       logger.m_string.str().c_str(),
       args);
