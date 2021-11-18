@@ -1694,21 +1694,21 @@ void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s)
 {
 	switch (type) {
 	case QtDebugMsg:
-		log_verbose("%s", qPrintable(s));
+        log_verbose(qPrintable(s));
 		break;
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
 	case QtInfoMsg:
-		log_info("%s", qPrintable(s));
+        log_info(qPrintable(s));
 		break;
 #endif
 	case QtWarningMsg:
-		log_warn("%s", qPrintable(s));
+        log_warn(qPrintable(s));
 		break;
 	case QtCriticalMsg:
-		log_err("%s", qPrintable(s));
+        log_err(qPrintable(s));
 		break;
 	case QtFatalMsg:
-		log_critical("%s", qPrintable(s));
+        log_critical(qPrintable(s));
 		break;
 	}
 }
@@ -1726,21 +1726,21 @@ void log_handler_with_category(QtMsgType type, const QMessageLogContext& c, cons
 {
     switch (type) {
     case QtDebugMsg:
-        log_verbose_t(c.category, "%s", qPrintable(s));
+        log_verbose_t(c.category, qPrintable(s));
         break;
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
     case QtInfoMsg:
-        log_info_t(c.category, "%s", qPrintable(s));
+        log_info_t(c.category, qPrintable(s));
         break;
 #endif
     case QtWarningMsg:
-        log_warn_t(c.category, "%s", qPrintable(s));
+        log_warn_t(c.category, qPrintable(s));
         break;
     case QtCriticalMsg:
-        log_err_t(c.category, "%s", qPrintable(s));
+        log_err_t(c.category, qPrintable(s));
         break;
     case QtFatalMsg:
-        log_critical_t(c.category, "%s", qPrintable(s));
+        log_critical_t(c.category, qPrintable(s));
         break;
     }
 }
