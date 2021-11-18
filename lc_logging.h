@@ -386,13 +386,13 @@ inline std::string prepend_location(const char* file, int line, const char* f, N
 #endif // defined(__APPLE__) && __OBJC__ == 1
 
 #define log_location_t_v(logfunc, tag, format, args) \
-   (logfunc(tag, prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), args))
+   (logfunc(tag, lightlogger::prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), args))
 #define log_location_t(logfunc, tag, format, ...) \
-   (logfunc(tag, prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), ##__VA_ARGS__))
+   (logfunc(tag, lightlogger::prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), ##__VA_ARGS__))
 #define log_location_v(logfunc, format, args) \
-   (logfunc(prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), args))
+   (logfunc(lightlogger::prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), args))
 #define log_location(logfunc, format, ...) \
-   (logfunc(prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), ##__VA_ARGS__))
+   (logfunc(lightlogger::prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), ##__VA_ARGS__))
 
 #ifdef ENABLE_CODE_LOCATION
 #define FUNC(name) f_log_ ##name
@@ -659,11 +659,11 @@ GENERATE_LEVEL_OBJC(critical, LC_LOG_CRITICAL, NO)
 #define log_critical_t_v(tag, format, args) \
    log_location_t_v(f_log_critical_t_v, tag, format, args)
 #define log_critical_t(tag, format, ...) \
-   log_location_t(f_log_critical_t, tag, format, ##__VA_ARGS__)
+   log_location_t(lightlogger::f_log_critical_t, tag, format, ##__VA_ARGS__)
 #define log_critical_v(format, args) \
    log_location_v(f_log_critical_v, format, args)
 #define log_critical(format, ...) \
-   log_location(f_log_critical, format, ##__VA_ARGS__)
+   log_location(lightlogger::f_log_critical, format, ##__VA_ARGS__)
 #endif // ENABLE_CODE_LOCATION
 #else
 GENERATE_LEVEL_CUSTOM(critical, bool, return false)
@@ -680,7 +680,7 @@ GENERATE_LEVEL_OBJC(err, LC_LOG_ERROR, NO)
 #define log_err_v(format, args) \
    log_location_v(f_log_err_v, format, args)
 #define log_err(format, ...) \
-   log_location(f_log_err, format, ##__VA_ARGS__)
+   log_location(lightlogger::f_log_err, format, ##__VA_ARGS__)
 #endif // ENABLE_CODE_LOCATION
 #else
 GENERATE_LEVEL_CUSTOM(err, bool, return false)
@@ -697,7 +697,7 @@ GENERATE_LEVEL_OBJC(warn, LC_LOG_WARN, NO)
 #define log_warn_v(format, args) \
    log_location_v(f_log_warn_v, format, args)
 #define log_warn(format, ...) \
-   log_location(f_log_warn, format, ##__VA_ARGS__)
+   log_location(lightlogger::f_log_warn, format, ##__VA_ARGS__)
 #endif // ENABLE_CODE_LOCATION
 #else
 GENERATE_LEVEL_CUSTOM(warn, bool, return false)
@@ -708,13 +708,13 @@ GENERATE_LEVEL(info, LC_LOG_INFO, true)
 GENERATE_LEVEL_OBJC(info, LC_LOG_INFO, YES)
 #ifdef ENABLE_CODE_LOCATION
 #define log_info_t_v(tag, format, args) \
-   log_location_t_v(f_log_info_t_v, tag, format, args)
+   log_location_t_v(lightlogger::f_log_info_t_v, tag, format, args)
 #define log_info_t(tag, format, ...) \
-   log_location_t(f_log_info_t, tag, format, ##__VA_ARGS__)
+   log_location_t(lightlogger::f_log_info_t, tag, format, ##__VA_ARGS__)
 #define log_info_v(format, args) \
-   log_location_v(f_log_info_v, format, args)
+   log_location_v(lightlogger::f_log_info_v, format, args)
 #define log_info(format, ...) \
-   log_location(f_log_info, format, ##__VA_ARGS__)
+   log_location(lightlogger::f_log_info, format, ##__VA_ARGS__)
 #endif // ENABLE_CODE_LOCATION
 
 /*------------------------------------------------------------------------------

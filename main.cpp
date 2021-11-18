@@ -61,7 +61,7 @@ void test_func2(int i)
 {
    (void)i;
 
-   log_stacktrace(LC_LOG_INFO, 90);
+   log_stacktrace(lightlogger::LC_LOG_INFO, 90);
 }
 
 /*------------------------------------------------------------------------------
@@ -137,8 +137,8 @@ int main(int argc, char** argv)
    log_info_t("MyTag", "Info log.");
    test_args("Testing %d va_args functions.", 2);
 
-   log_debug("Some message for debugging...");
-   log_disabled("A disabled log!!!!!!!!!!! You won't see this.");
+   lightlogger::log_debug("Some message for debugging...");
+   lightlogger::log_disabled("A disabled log!!!!!!!!!!! You won't see this.");
 
    log_critical("Print int: %d.", 5);
    log_critical_t("MyTag", "Print int: %d.", 5);
@@ -146,8 +146,8 @@ int main(int argc, char** argv)
 
    /*lc_formatted_printf(stdout, LC_LOG_ATTR_UNDERLINE, LC_LOG_COL_MAGENTA,
                      "Underlined %s! ;-)\n", "magenta");*/
-   log_formatted(LC_LOG_ATTR_UNDERLINE, LC_LOG_COL_YELLOW, "Formatted text.");
-   log_formatted(LC_LOG_COL_YELLOW, "Formatted text with %s.", "param");
+   lightlogger::log_formatted(lightlogger::LC_LOG_ATTR_UNDERLINE, lightlogger::LC_LOG_COL_YELLOW, "Formatted text.");
+   lightlogger::log_formatted(lightlogger::LC_LOG_COL_YELLOW, "Formatted text with %s.", "param");
 
 #ifndef __ANDROID__
    test_func();
@@ -155,35 +155,35 @@ int main(int argc, char** argv)
 
    // Using streams.
    {
-      LC_LogDef logger(NULL, LC_LOG_ATTR_RESET, LC_LOG_COL_BLUE);
+      lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_LOG_COL_BLUE);
       logger.stream() << "Blue log using stream. " << "Params can be added like " << 1234 << ".";
 
-      LC_LogDef l(NULL);
+      lightlogger::LC_LogDef l(NULL);
       Q_UNUSED(l);
    }
 
    {
-      LC_Log<LC_Output2Std> logger(LC_LOG_DEBUG);
+      lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_DEBUG);
       logger.stream() << "Debug log with stream.";
    }
 
    {
-      LC_Log<LC_Output2Std> logger(LC_LOG_WARN);
+      lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_WARN);
       logger.stream() << "Warning log with stream.";
    }
 
    {
-      LC_Log<LC_Output2Std> logger(LC_LOG_CRITICAL);
+      lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_CRITICAL);
       logger.stream() << "Critical log with stream.";
    }
 
 #if defined(QT_QML_LIB) && defined(QT_QUICK_LIB)
    QQuickView view;
-   LC_QMLLogger::registerObject(view.rootContext());
+   lightlogger::LC_QMLLogger::registerObject(view.rootContext());
    view.setSource(QUrl("qrc:///main.qml"));
 #endif
 
-   assert(log_verbose("") == true);
+   //assert(log_verbose("") == true);
    assert(log_info("") == true);
    assert(log_warn("") == false);
    assert(log_err("") == false);
