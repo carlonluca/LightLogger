@@ -146,8 +146,8 @@ int main(int argc, char** argv)
 
    /*lc_formatted_printf(stdout, LC_LOG_ATTR_UNDERLINE, LC_LOG_COL_MAGENTA,
                      "Underlined %s! ;-)\n", "magenta");*/
-   lightlogger::log_formatted(lightlogger::LC_LOG_ATTR_UNDERLINE, lightlogger::LC_LOG_COL_YELLOW, "Formatted text.");
-   lightlogger::log_formatted(lightlogger::LC_LOG_COL_YELLOW, "Formatted text with %s.", "param");
+   lightlogger::log_formatted(lightlogger::LC_LOG_ATTR_UNDERLINE, lightlogger::LC_FORG_COL_YELLOW, "Formatted text.");
+   lightlogger::log_formatted(lightlogger::LC_FORG_COL_YELLOW, "Formatted text with %s.", "param");
 
 #ifndef __ANDROID__
    test_func();
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
 
    // Using streams.
    {
-      lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_LOG_COL_BLUE);
+      lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE);
       logger.stream() << "Blue log using stream. " << "Params can be added like " << 1234 << ".";
 
       lightlogger::LC_LogDef l(NULL);
@@ -163,8 +163,13 @@ int main(int argc, char** argv)
    }
 
    {
-       lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_LOG_COL_BLUE, lightlogger::LC_BACK_COL_MAGENTA);
+       lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE, lightlogger::LC_BACK_COL_MAGENTA);
        logger.stream() << "Blue text on magenta";
+   }
+
+   {
+       lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE, lightlogger::LC_BACK_BRIGHT_COL_MAGENTA);
+       logger.stream() << "Blue text on bright magenta";
    }
 
    {

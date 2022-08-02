@@ -208,68 +208,87 @@ namespace lightlogger {
 |    definitions
 +-----------------------------------------------------------------------------*/
 enum LC_LogLevel {
-   // Do not mess with the order.
-   LC_LOG_CRITICAL = 0,
-   LC_LOG_ERROR = 1,
-   LC_LOG_WARN = 2,
-   LC_LOG_INFO = 3,
-   LC_LOG_VERBOSE = 4,
-   LC_LOG_DEBUG = 5,
-   LC_LOG_NONE = 1000
+    // Do not mess with the order.
+    LC_LOG_CRITICAL = 0,
+    LC_LOG_ERROR = 1,
+    LC_LOG_WARN = 2,
+    LC_LOG_INFO = 3,
+    LC_LOG_VERBOSE = 4,
+    LC_LOG_DEBUG = 5,
+    LC_LOG_NONE = 1000
 };
 
 // Text attributes.
-#define C_RESET     0
-#define C_BRIGHT    1 // Bold.
-#define C_DIM       2
-#define C_UNDERLINE 4 // Underscore
-#define C_BLINK     5
-#define C_REVERSE   7
-#define C_HIDDEN    8
+#define C_RESET         0
+#define C_BRIGHT        1 // Bold
+#define C_DIM           2 // Faint
+#define C_ITALIC        3
+#define C_UNDERLINE     4 // Underscore
+#define C_BLINK         5
+#define C_REVERSE       7
+#define C_HIDDEN        8
+#define C_STRIKETHROUGH 9
 
 enum LC_LogAttrib {
-   LC_LOG_ATTR_RESET = C_RESET,
-   LC_LOG_ATTR_BRIGHT = C_BRIGHT,
-   LC_LOG_ATTR_DIM = C_DIM,
-   LC_LOG_ATTR_UNDERLINE = C_UNDERLINE,
-   LC_LOG_ATTR_BLINK = C_BLINK,
-   LC_LOG_ATTR_REVERSE = C_REVERSE,
-   LC_LOG_ATTR_HIDDEN = C_HIDDEN
+    LC_LOG_ATTR_RESET =         C_RESET,
+    LC_LOG_ATTR_BRIGHT =        C_BRIGHT,
+    LC_LOG_ATTR_DIM =           C_DIM,
+    LC_LOG_ATTR_UNDERLINE =     C_UNDERLINE,
+    LC_LOG_ATTR_BLINK =         C_BLINK,
+    LC_LOG_ATTR_REVERSE =       C_REVERSE,
+    LC_LOG_ATTR_HIDDEN =        C_HIDDEN,
+    LC_LOG_ATTR_STRIKETHROUGH = C_STRIKETHROUGH
 };
 
 // Foreground colors.
-#define C_F_BLACK     0
-#define C_F_RED       1
-#define C_F_GREEN     2
-#define C_F_YELLOW    3
-#define C_F_BLUE      4
-#define C_F_MAGENTA   5
-#define C_F_CYAN      6
-#define C_F_WHITE     7
-#define C_F_DEFAULT   9
+#define LC_BLACK      0
+#define LC_RED        1
+#define LC_GREEN      2
+#define LC_YELLOW     3
+#define LC_BLUE       4
+#define LC_MAGENTA    5
+#define LC_CYAN       6
+#define LC_WHITE      7
+#define LC_DEFAULT    9
 
 enum LC_LogColor {
-   LC_LOG_COL_BLACK =    30 + C_F_BLACK,
-   LC_LOG_COL_RED =      30 + C_F_RED,
-   LC_LOG_COL_GREEN =    30 + C_F_GREEN,
-   LC_LOG_COL_YELLOW =   30 + C_F_YELLOW,
-   LC_LOG_COL_BLUE =     30 + C_F_BLUE,
-   LC_LOG_COL_MAGENTA =  30 + C_F_MAGENTA,
-   LC_LOG_COL_CYAN =     30 + C_F_CYAN,
-   LC_LOG_COL_WHITE =    30 + C_F_WHITE,
-   LC_LOG_COL_DEFAULT =  30 + C_F_DEFAULT
+    LC_FORG_COL_BLACK =          30 + LC_BLACK,
+    LC_FORG_COL_RED =            30 + LC_RED,
+    LC_FORG_COL_GREEN =          30 + LC_GREEN,
+    LC_FORG_COL_YELLOW =         30 + LC_YELLOW,
+    LC_FORG_COL_BLUE =           30 + LC_BLUE,
+    LC_FORG_COL_MAGENTA =        30 + LC_MAGENTA,
+    LC_FORG_COL_CYAN =           30 + LC_CYAN,
+    LC_FORG_COL_WHITE =          30 + LC_WHITE,
+    LC_FORG_BRIGHT_COL_BLACK =   90 + LC_BLACK,
+    LC_FORG_BRIGHT_COL_RED =     90 + LC_RED,
+    LC_FORG_BRIGHT_COL_GREEN =   90 + LC_GREEN,
+    LC_FORG_BRIGHT_COL_YELLOW =  90 + LC_YELLOW,
+    LC_FORG_BRIGHT_COL_BLUE =    90 + LC_BLUE,
+    LC_FORG_BRIGHT_COL_MAGENTA = 90 + LC_MAGENTA,
+    LC_FORG_BRIGHT_COL_CYAN =    90 + LC_CYAN,
+    LC_FORG_BRIGHT_COL_WHITE =   90 + LC_WHITE,
+    LC_FORG_COL_DEFAULT =        30 + LC_DEFAULT
 };
 
 enum LC_BackColor {
-    LC_BACK_COL_BLACK =    40 + C_F_BLACK,
-    LC_BACK_COL_RED =      40 + C_F_RED,
-    LC_BACK_COL_GREEN =    40 + C_F_GREEN,
-    LC_BACK_COL_YELLOW =   40 + C_F_YELLOW,
-    LC_BACK_COL_BLUE =     40 + C_F_BLUE,
-    LC_BACK_COL_MAGENTA =  40 + C_F_MAGENTA,
-    LC_BACK_COL_CYAN =     40 + C_F_CYAN,
-    LC_BACK_COL_WHITE =    40 + C_F_WHITE,
-    LC_BACK_COL_DEFAULT =  40 + C_F_DEFAULT
+    LC_BACK_COL_BLACK =          40 + LC_BLACK,
+    LC_BACK_COL_RED =            40 + LC_RED,
+    LC_BACK_COL_GREEN =          40 + LC_GREEN,
+    LC_BACK_COL_YELLOW =         40 + LC_YELLOW,
+    LC_BACK_COL_BLUE =           40 + LC_BLUE,
+    LC_BACK_COL_MAGENTA =        40 + LC_MAGENTA,
+    LC_BACK_COL_CYAN =           40 + LC_CYAN,
+    LC_BACK_COL_WHITE =          40 + LC_WHITE,
+    LC_BACK_BRIGHT_COL_BLACK =   100 + LC_BLACK,
+    LC_BACK_BRIGHT_COL_RED =     100 + LC_RED,
+    LC_BACK_BRIGHT_COL_GREEN =   100 + LC_GREEN,
+    LC_BACK_BRIGHT_COL_YELLOW =  100 + LC_YELLOW,
+    LC_BACK_BRIGHT_COL_BLUE =    100 + LC_BLUE,
+    LC_BACK_BRIGHT_COL_MAGENTA = 100 + LC_MAGENTA,
+    LC_BACK_BRIGHT_COL_CYAN =    100 + LC_CYAN,
+    LC_BACK_BRIGHT_COL_WHITE =   100 + LC_WHITE,
+    LC_BACK_COL_DEFAULT =        40 + LC_DEFAULT
 };
 
 #ifdef XCODE_COLORING_ENABLED
@@ -1483,12 +1502,12 @@ inline void LC_Output2Std::printf(LC_Log<LC_Output2Std>& logger, va_list args)
 inline LC_LogColor LC_Output2Std::getColorForLevel(LC_LogLevel level)
 {
    static const LC_LogColor LC_COLOR_MAP [] = {
-      LC_LOG_COL_RED,
-      LC_LOG_COL_RED,
-      LC_LOG_COL_YELLOW,
-      LC_LOG_COL_GREEN,
-      LC_LOG_COL_WHITE,
-      LC_LOG_COL_BLUE
+      LC_FORG_COL_RED,
+      LC_FORG_COL_RED,
+      LC_FORG_COL_YELLOW,
+      LC_FORG_COL_GREEN,
+      LC_FORG_COL_WHITE,
+      LC_FORG_COL_BLUE
    };
 
    return LC_COLOR_MAP[level];
