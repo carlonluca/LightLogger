@@ -249,27 +249,15 @@ enum LC_LogAttrib {
 #define C_F_DEFAULT   9
 
 enum LC_LogColor {
-   LC_LOG_COL_BLACK =    30 + C_F_BLACK,
-   LC_LOG_COL_RED =      30 + C_F_RED,
-   LC_LOG_COL_GREEN =    30 + C_F_GREEN,
-   LC_LOG_COL_YELLOW =   30 + C_F_YELLOW,
-   LC_LOG_COL_BLUE =     30 + C_F_BLUE,
-   LC_LOG_COL_MAGENTA =  30 + C_F_MAGENTA,
-   LC_LOG_COL_CYAN =     30 + C_F_CYAN,
-   LC_LOG_COL_WHITE =    30 + C_F_WHITE,
-   LC_LOG_COL_DEFAULT =  30 + C_F_DEFAULT
-};
-
-enum LC_BackColor {
-    LC_BACK_COL_BLACK =    40 + C_F_BLACK,
-    LC_BACK_COL_RED =      40 + C_F_RED,
-    LC_BACK_COL_GREEN =    40 + C_F_GREEN,
-    LC_BACK_COL_YELLOW =   40 + C_F_YELLOW,
-    LC_BACK_COL_BLUE =     40 + C_F_BLUE,
-    LC_BACK_COL_MAGENTA =  40 + C_F_MAGENTA,
-    LC_BACK_COL_CYAN =     40 + C_F_CYAN,
-    LC_BACK_COL_WHITE =    40 + C_F_WHITE,
-    LC_BACK_COL_DEFAULT =  40 + C_F_DEFAULT
+   LC_LOG_COL_BLACK = C_F_BLACK,
+   LC_LOG_COL_RED = C_F_RED,
+   LC_LOG_COL_GREEN = C_F_GREEN,
+   LC_LOG_COL_YELLOW = C_F_YELLOW,
+   LC_LOG_COL_BLUE = C_F_BLUE,
+   LC_LOG_COL_MAGENTA = C_F_MAGENTA,
+   LC_LOG_COL_CYAN = C_F_CYAN,
+   LC_LOG_COL_WHITE = C_F_WHITE,
+   LC_LOG_COL_DEFAULT = C_F_DEFAULT
 };
 
 #ifdef XCODE_COLORING_ENABLED
@@ -307,26 +295,10 @@ inline std::string lc_current_time();
 * @param f The FILE* on which the color change should be written.
 * @param attrib An attribute.
 * @param color A color.
-* @param foreground The background color.
-*/
-inline void lc_font_change(FILE* f, LC_LogAttrib attrib, LC_LogColor color, LC_BackColor foreground)
-{
-    fprintf(f, "%c[%d;%dm%c[%dm", 0x1B, attrib, color, 0x1B, foreground);
-}
-
-/*------------------------------------------------------------------------------
-|    lc_font_change
-+-----------------------------------------------------------------------------*/
-/**
-* @brief lc_font_change Changes font attributes. These will be used for the text
-* following this call.
-* @param f The FILE* on which the color change should be written.
-* @param attrib An attribute.
-* @param color A color.
 */
 inline void lc_font_change(FILE* f, LC_LogAttrib attrib, LC_LogColor color)
 {
-   fprintf(f, "%c[%d;%dm", 0x1B, attrib, color);
+   fprintf(f, "%c[%d;%dm", 0x1B, attrib, color + 30);
 }
 
 /*------------------------------------------------------------------------------
@@ -365,15 +337,12 @@ inline void lc_color_change(FILE* f, LC_LogColor color)
 * @param color Color to use for the font.
 * @param format The text to write followed by the parameters.
 */
-inline void lc_formatted_printf(FILE* f, LC_LogAttrib attrib, LC_LogColor color, LC_BackColor foreground, const char* format, ...)
+inline void lc_formatted_printf(FILE* f, LC_LogAttrib attrib, LC_LogColor color, const char* format, ...)
 {
    std::stringstream sink;
    sink << (char) 0x1B
       << "[" << (int) attrib << ";"
-      << (int)color << "m";
-   sink << (char) 0x1B
-      << "[" << (int) attrib << ";"
-      << (int)foreground << "m";
+      << (int) ((int) color + 30) << "m";
    sink << format;
    sink << (char) 0x1B
       << "[" << (int) LC_LOG_ATTR_RESET << "m";
@@ -417,13 +386,13 @@ inline std::string prepend_location(const char* file, int line, const char* f, N
 #endif // defined(__APPLE__) && __OBJC__ == 1
 
 #define log_location_t_v(logfunc, tag, format, args) \
-   (logfunc(tag, lightlogger::prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), args))
+   (logfunc(tag, prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), args))
 #define log_location_t(logfunc, tag, format, ...) \
-   (logfunc(tag, lightlogger::prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), ##__VA_ARGS__))
+   (logfunc(tag, prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), ##__VA_ARGS__))
 #define log_location_v(logfunc, format, args) \
-   (logfunc(lightlogger::prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), args))
+   (logfunc(prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), args))
 #define log_location(logfunc, format, ...) \
-   (logfunc(lightlogger::prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), ##__VA_ARGS__))
+   (logfunc(prepend_location(__FILE__, __LINE__, __FUNCTION__, format).data(), ##__VA_ARGS__))
 
 #ifdef ENABLE_CODE_LOCATION
 #define FUNC(name) f_log_ ##name
@@ -564,7 +533,6 @@ public:
    LC_Log(const char* log_tag, bool nl = true);
    LC_Log(const char* log_tag, LC_LogLevel level, bool nl = true);
    LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor color, bool nl = true);
-   LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor color, LC_BackColor foreground, bool nl = true);
 
    ~LC_Log();
 
@@ -592,7 +560,6 @@ public:
    const char* m_log_tag;
    LC_LogAttrib m_attrib;
    LC_LogColor m_color;
-   LC_BackColor m_foreground;
    bool m_nl;
 
 private:
@@ -692,11 +659,11 @@ GENERATE_LEVEL_OBJC(critical, LC_LOG_CRITICAL, NO)
 #define log_critical_t_v(tag, format, args) \
    log_location_t_v(f_log_critical_t_v, tag, format, args)
 #define log_critical_t(tag, format, ...) \
-   log_location_t(lightlogger::f_log_critical_t, tag, format, ##__VA_ARGS__)
+   log_location_t(f_log_critical_t, tag, format, ##__VA_ARGS__)
 #define log_critical_v(format, args) \
    log_location_v(f_log_critical_v, format, args)
 #define log_critical(format, ...) \
-   log_location(lightlogger::f_log_critical, format, ##__VA_ARGS__)
+   log_location(f_log_critical, format, ##__VA_ARGS__)
 #endif // ENABLE_CODE_LOCATION
 #else
 GENERATE_LEVEL_CUSTOM(critical, bool, return false)
@@ -713,7 +680,7 @@ GENERATE_LEVEL_OBJC(err, LC_LOG_ERROR, NO)
 #define log_err_v(format, args) \
    log_location_v(f_log_err_v, format, args)
 #define log_err(format, ...) \
-   log_location(lightlogger::f_log_err, format, ##__VA_ARGS__)
+   log_location(f_log_err, format, ##__VA_ARGS__)
 #endif // ENABLE_CODE_LOCATION
 #else
 GENERATE_LEVEL_CUSTOM(err, bool, return false)
@@ -730,7 +697,7 @@ GENERATE_LEVEL_OBJC(warn, LC_LOG_WARN, NO)
 #define log_warn_v(format, args) \
    log_location_v(f_log_warn_v, format, args)
 #define log_warn(format, ...) \
-   log_location(lightlogger::f_log_warn, format, ##__VA_ARGS__)
+   log_location(f_log_warn, format, ##__VA_ARGS__)
 #endif // ENABLE_CODE_LOCATION
 #else
 GENERATE_LEVEL_CUSTOM(warn, bool, return false)
@@ -741,13 +708,13 @@ GENERATE_LEVEL(info, LC_LOG_INFO, true)
 GENERATE_LEVEL_OBJC(info, LC_LOG_INFO, YES)
 #ifdef ENABLE_CODE_LOCATION
 #define log_info_t_v(tag, format, args) \
-   log_location_t_v(lightlogger::f_log_info_t_v, tag, format, args)
+   log_location_t_v(f_log_info_t_v, tag, format, args)
 #define log_info_t(tag, format, ...) \
-   log_location_t(lightlogger::f_log_info_t, tag, format, ##__VA_ARGS__)
+   log_location_t(f_log_info_t, tag, format, ##__VA_ARGS__)
 #define log_info_v(format, args) \
-   log_location_v(lightlogger::f_log_info_v, format, args)
+   log_location_v(f_log_info_v, format, args)
 #define log_info(format, ...) \
-   log_location(lightlogger::f_log_info, format, ##__VA_ARGS__)
+   log_location(f_log_info, format, ##__VA_ARGS__)
 #endif // ENABLE_CODE_LOCATION
 
 /*------------------------------------------------------------------------------
@@ -1105,11 +1072,11 @@ inline void log_stacktrace(const char* log_tag, unsigned int max_frames)
 |    LC_Log<T>::LC_Log
 +-----------------------------------------------------------------------------*/
 template <typename T> inline LC_Log<T>::LC_Log(LC_LogColor color, bool nl) :
-    m_level(LC_LOG_NONE)
-  , m_log_tag(LOG_TAG)
-  , m_attrib(LC_LOG_ATTR_RESET)
-  , m_color(color)
-  , m_nl(nl)
+   m_level(LC_LOG_NONE)
+   , m_log_tag(LOG_TAG)
+   , m_attrib(LC_LOG_ATTR_RESET)
+   , m_color(color)
+ , m_nl(nl)
 {
    // Do nothing.
 }
@@ -1118,9 +1085,9 @@ template <typename T> inline LC_Log<T>::LC_Log(LC_LogColor color, bool nl) :
 |    LC_Log<T>::LC_Log
 +-----------------------------------------------------------------------------*/
 template <typename T> inline LC_Log<T>::LC_Log(const char* log_tag, LC_LogLevel level, bool nl) :
-    m_level(level)
-  , m_log_tag(log_tag)
-  , m_nl(nl)
+   m_level(level)
+   , m_log_tag(log_tag)
+ , m_nl(nl)
 {
    // Do nothing.
 }
@@ -1129,9 +1096,9 @@ template <typename T> inline LC_Log<T>::LC_Log(const char* log_tag, LC_LogLevel 
 |    LC_Log<T>::LC_Log
 +-----------------------------------------------------------------------------*/
 template <typename T> inline LC_Log<T>::LC_Log(const char *log_tag, bool nl) :
-    m_level(LC_LOG_INFO)
-  , m_log_tag(log_tag)
-  , m_nl(nl)
+   m_level(LC_LOG_INFO)
+   , m_log_tag(log_tag)
+ , m_nl(nl)
 {
    // Do nothing.
 }
@@ -1140,9 +1107,9 @@ template <typename T> inline LC_Log<T>::LC_Log(const char *log_tag, bool nl) :
 |    LC_Log<T>::LC_Log
 +-----------------------------------------------------------------------------*/
 template <typename T> inline LC_Log<T>::LC_Log(LC_LogLevel level, bool nl) :
-    m_level(level)
-  , m_log_tag(LOG_TAG)
-  , m_nl(nl)
+   m_level(level)
+   , m_log_tag(LOG_TAG)
+ , m_nl(nl)
 {
    // Do nothing.
 }
@@ -1151,26 +1118,13 @@ template <typename T> inline LC_Log<T>::LC_Log(LC_LogLevel level, bool nl) :
 |    LC_Log<T>::LC_Log
 +-----------------------------------------------------------------------------*/
 template <typename T> inline LC_Log<T>::LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor color, bool nl) :
-    m_level(LC_LOG_NONE)
-  , m_log_tag(log_tag)
-  , m_attrib(attrib)
-  , m_color(color)
-  , m_foreground(LC_BACK_COL_DEFAULT)
-  , m_nl(nl)
+   m_level(LC_LOG_NONE)
+   , m_log_tag(log_tag)
+   , m_attrib(attrib)
+   , m_color(color)
+ , m_nl(nl)
 {
-    // Do nothing.
-}
-
-template<typename T>
-LC_Log<T>::LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor color, LC_BackColor foreground, bool nl) :
-    m_level(LC_LOG_NONE)
-  , m_log_tag(log_tag)
-  , m_attrib(attrib)
-  , m_color(color)
-  , m_foreground(foreground)
-  , m_nl(nl)
-{
-    // Do nothing.
+   // Do nothing.
 }
 
 /*------------------------------------------------------------------------------
@@ -1433,24 +1387,19 @@ inline void LC_Output2Std::printf(LC_Log<LC_Output2Std>& logger, va_list args)
 #ifdef COLORING_ENABLED
    LC_LogAttrib attrib;
    LC_LogColor  color;
-   LC_BackColor foreground;
    if (LC_LIKELY(logger.m_level != LC_LOG_NONE)) {
       attrib = LC_LOG_ATTR_RESET;
       color = getColorForLevel(logger.m_level);
-      foreground = LC_BACK_COL_DEFAULT;
    }
    else {
       attrib = logger.m_attrib;
       color = logger.m_color;
-      foreground = logger.m_foreground;
    }
 
    std::stringstream sink;
    sink << (char) 0x1B
       << "[" << (int) attrib << ";"
-      << (int)color << "m";
-   sink << (char) 0x1B
-      << "[" << (int)foreground << "m";
+      << (int) (color + 30) << "m";
    sink << logger.m_string.str();
    sink << (char) 0x1B
       << "[" << (int) LC_LOG_ATTR_RESET << "m";
@@ -1586,9 +1535,8 @@ inline void LC_OutputAndroid::printf(LC_Log<LC_OutputAndroid>& logger, va_list a
       ANDROID_LOG_DEBUG
    };
 
-   android_LogPriority p = (logger.m_level > 5 || logger.m_level < 0) ? ANDROID_LOG_INFO : android_logPriority[logger.m_level];
    __android_log_vprint(
-      p,
+      android_logPriority[logger.m_level],
       logger.m_log_tag,
       logger.m_string.str().c_str(),
       args);
@@ -1746,55 +1694,23 @@ void log_handler(QtMsgType type, const QMessageLogContext&, const QString& s)
 {
 	switch (type) {
 	case QtDebugMsg:
-        log_verbose(qPrintable(s));
+		log_verbose("%s", qPrintable(s));
 		break;
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
 	case QtInfoMsg:
-        log_info(qPrintable(s));
+		log_info("%s", qPrintable(s));
 		break;
 #endif
 	case QtWarningMsg:
-        log_warn(qPrintable(s));
+		log_warn("%s", qPrintable(s));
 		break;
 	case QtCriticalMsg:
-        log_err(qPrintable(s));
+		log_err("%s", qPrintable(s));
 		break;
 	case QtFatalMsg:
-        log_critical(qPrintable(s));
+		log_critical("%s", qPrintable(s));
 		break;
 	}
-}
-
-/*------------------------------------------------------------------------------
-|    log_handler_with_category
-+-----------------------------------------------------------------------------*/
-/**
- * @brief log_handler Function to handle Qt debugging output including the category.
- * @param type
- * @param msg
- */
-inline
-void log_handler_with_category(QtMsgType type, const QMessageLogContext& c, const QString& s)
-{
-    switch (type) {
-    case QtDebugMsg:
-        log_verbose_t(c.category, qPrintable(s));
-        break;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-    case QtInfoMsg:
-        log_info_t(c.category, qPrintable(s));
-        break;
-#endif
-    case QtWarningMsg:
-        log_warn_t(c.category, qPrintable(s));
-        break;
-    case QtCriticalMsg:
-        log_err_t(c.category, qPrintable(s));
-        break;
-    case QtFatalMsg:
-        log_critical_t(c.category, qPrintable(s));
-        break;
-    }
 }
 
 #endif // QT_CORE_LIB

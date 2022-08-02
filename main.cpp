@@ -163,6 +163,11 @@ int main(int argc, char** argv)
    }
 
    {
+       lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_LOG_COL_BLUE, lightlogger::LC_BACK_COL_MAGENTA);
+       logger.stream() << "Blue text on magenta";
+   }
+
+   {
       lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_DEBUG);
       logger.stream() << "Debug log with stream.";
    }
