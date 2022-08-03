@@ -187,6 +187,16 @@ int main(int argc, char** argv)
       logger.stream() << "Critical log with stream.";
    }
 
+   {
+       lightlogger::lc_font_change(stdout, std::set<lightlogger::LC_LogAttrib> {
+           lightlogger::LC_LOG_ATTR_BLINK,
+           lightlogger::LC_LOG_ATTR_UNDERLINE
+       }, lightlogger::LC_FORG_COL_RED, lightlogger::LC_BACK_COL_YELLOW);
+       fprintf(stdout, "HELLO");
+       lightlogger::lc_font_reset(stdout);
+       fprintf(stdout, "\n");
+   }
+
 #if defined(QT_QML_LIB) && defined(QT_QUICK_LIB)
    QQuickView view;
    lightlogger::LC_QMLLogger::registerObject(view.rootContext());

@@ -77,6 +77,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <set>
 #if !defined(_WIN32) && !defined(_WIN32_WCE)
 #include <libgen.h>
 #endif
@@ -316,6 +317,25 @@ inline const NSString* lc_xc_col(const int& index)
 #endif // XCODE_COLORING_ENABLED
 
 inline std::string lc_current_time();
+
+/*------------------------------------------------------------------------------
+|    lc_font_change
++-----------------------------------------------------------------------------*/
+/**
+* @brief lc_font_change Changes font attributes. These will be used for the text
+* following this call.
+* @param f The FILE* on which the color change should be written.
+* @param attribs A set of attributes to enable.
+* @param color A color.
+* @param foreground The background color.
+*/
+inline void lc_font_change(FILE* f, std::set<LC_LogAttrib> attribs, LC_LogColor color, LC_BackColor foreground)
+{
+    fprintf(f, "%c[%d;%d", 0x1B, color, foreground);
+    for (const LC_LogAttrib& attrib : attribs)
+        fprintf(f, ";%d", attrib);
+    fprintf(f, "m");
+}
 
 /*------------------------------------------------------------------------------
 |    lc_font_change
