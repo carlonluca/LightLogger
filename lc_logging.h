@@ -226,6 +226,7 @@ enum LC_LogLevel {
 #define C_ITALIC        3
 #define C_UNDERLINE     4 // Underscore
 #define C_BLINK         5
+#define C_RAPID_BLINK   6
 #define C_REVERSE       7
 #define C_HIDDEN        8
 #define C_STRIKETHROUGH 9
@@ -234,8 +235,10 @@ enum LC_LogAttrib {
     LC_LOG_ATTR_RESET =         C_RESET,
     LC_LOG_ATTR_BRIGHT =        C_BRIGHT,
     LC_LOG_ATTR_DIM =           C_DIM,
+    LC_LOG_ATTR_ITALIC =        C_ITALIC,
     LC_LOG_ATTR_UNDERLINE =     C_UNDERLINE,
     LC_LOG_ATTR_BLINK =         C_BLINK,
+    LC_LOG_ATTR_RAPID_BLINK =   C_RAPID_BLINK,
     LC_LOG_ATTR_REVERSE =       C_REVERSE,
     LC_LOG_ATTR_HIDDEN =        C_HIDDEN,
     LC_LOG_ATTR_STRIKETHROUGH = C_STRIKETHROUGH
