@@ -929,7 +929,7 @@ inline bool log_disabled(NSString* format, ...)
 * @param level The log level of the log.
 * @param max_frames The maximum number of lines of stack trace to log.
 */
-inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int max_frames)
+inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int max_frames, std::function<void(std::string, const char* log_tag, LC_LogLevel level)> f)
 {
    std::stringstream stream;
    stream << std::endl;
@@ -1001,7 +1001,7 @@ inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int 
          stream << "  " << symbollist[i] << std::endl;
    }
 
-   LC_LogDef(log_tag, level).printf("%s", stream.str().c_str());
+   f(stream.str(), log_tag, level);
 
    free(funcname);
    free(symbollist);
@@ -1042,6 +1042,16 @@ inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int 
    free(stack);
 }
 #endif // !defined(_WIN32) && !defined(_WIN32_WCE)
+
+/*------------------------------------------------------------------------------
+|    log_stacktrace
++-----------------------------------------------------------------------------*/
+inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int max_frames)
+{
+    log_stacktrace(log_tag, level, max_frames, [] (std::string s, const char* log_tag, LC_LogLevel level) {
+        LC_LogDef(log_tag, level).printf("%s", s.c_str());
+    });
+}
 
 /*------------------------------------------------------------------------------
 |    log_stacktrace
