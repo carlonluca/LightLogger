@@ -18,10 +18,8 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-SOURCES  += main.cpp \
-    applogging.cpp
-HEADERS  += lc_logging_qt.h \
-    applogging.h
+SOURCES  += main.cpp applogging.cpp
+HEADERS  += lc_logging_qt.h applogging.h
 
 DEFINES  += BUILD_LOG_LEVEL_INFORMATION ENABLE_CODE_LOCATION
 

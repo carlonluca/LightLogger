@@ -30,8 +30,8 @@
  */
 
 /*------------------------------------------------------------------------------
- |    includes
- +-----------------------------------------------------------------------------*/
+|    includes
++-----------------------------------------------------------------------------*/
 #ifndef __ANDROID__
 #include <QGuiApplication>
 #include <QElapsedTimer>
@@ -48,28 +48,28 @@
 
 extern "C" void Java_com_luke_android_lightloggerandroid_MainActivity_log(JNIEnv* env, jobject obj)
 {
-   log_debug_t("LightLoggerAndroid", "Done! ;-)");
-   log_warn_t("LightLoggerAndroid", "Warn log! ;-)");
+    log_debug_t("LightLoggerAndroid", "Done! ;-)");
+    log_warn_t("LightLoggerAndroid", "Warn log! ;-)");
 }
 #endif
 
 #ifndef __ANDROID__
 /*------------------------------------------------------------------------------
- |    test_func2
- +-----------------------------------------------------------------------------*/
+|    test_func2
++-----------------------------------------------------------------------------*/
 void test_func2(int i)
 {
-   (void)i;
+    (void)i;
 
-   log_stacktrace(lightlogger::LC_LOG_INFO, 90);
+    log_stacktrace(lightlogger::LC_LOG_INFO, 90);
 }
 
 /*------------------------------------------------------------------------------
- |    test_func
- +-----------------------------------------------------------------------------*/
+|    test_func
++-----------------------------------------------------------------------------*/
 void test_func()
 {
-   test_func2(1);
+    test_func2(1);
 }
 
 /*------------------------------------------------------------------------------
@@ -77,30 +77,30 @@ void test_func()
 +-----------------------------------------------------------------------------*/
 void test_args(const char* format, ...)
 {
-   {
-      va_list args;
-      va_start(args, format);
-      log_info_v(format, args);
-      va_end(args);
-   }
+    {
+        va_list args;
+        va_start(args, format);
+        log_info_v(format, args);
+        va_end(args);
+    }
 
-   {
-      va_list args;
-      va_start(args, format);
-      log_info_t_v("MyTag", format, args);
-      va_end(args);
-   }
+    {
+        va_list args;
+        va_start(args, format);
+        log_info_t_v("MyTag", format, args);
+        va_end(args);
+    }
 }
 #endif
 
 #ifndef __ANDROID__
 /*------------------------------------------------------------------------------
- |    main
- +-----------------------------------------------------------------------------*/
+|    main
++-----------------------------------------------------------------------------*/
 int main(int argc, char** argv)
 {
 #if defined(QT_QML_LIB) && defined(QT_QUICK_LIB)
-   QGuiApplication a(argc, argv);
+    QGuiApplication a(argc, argv);
 #endif
 
 #if 0
@@ -130,85 +130,85 @@ int main(int argc, char** argv)
 #endif
 
 #ifdef __GNUC__
-   LOG_CRITICAL("MyTag", "Oooops!");
+    LOG_CRITICAL("MyTag", "Oooops!");
 #endif
 
-   log_info("Info log.");
-   log_info_t("MyTag", "Info log.");
-   test_args("Testing %d va_args functions.", 2);
+    log_info("Info log.");
+    log_info_t("MyTag", "Info log.");
+    test_args("Testing %d va_args functions.", 2);
 
-   lightlogger::log_debug("Some message for debugging...");
-   lightlogger::log_disabled("A disabled log!!!!!!!!!!! You won't see this.");
+    lightlogger::log_debug("Some message for debugging...");
+    lightlogger::log_disabled("A disabled log!!!!!!!!!!! You won't see this.");
 
-   log_critical("Print int: %d.", 5);
-   log_critical_t("MyTag", "Print int: %d.", 5);
-   log_critical_t("MyTag", "Print with tag only.");
+    log_critical("Print int: %d.", 5);
+    log_critical_t("MyTag", "Print int: %d.", 5);
+    log_critical_t("MyTag", "Print with tag only.");
 
-   /*lc_formatted_printf(stdout, LC_LOG_ATTR_UNDERLINE, LC_LOG_COL_MAGENTA,
+    /*lc_formatted_printf(stdout, LC_LOG_ATTR_UNDERLINE, LC_LOG_COL_MAGENTA,
                      "Underlined %s! ;-)\n", "magenta");*/
-   lightlogger::log_formatted(lightlogger::LC_LOG_ATTR_UNDERLINE, lightlogger::LC_FORG_COL_YELLOW, "Formatted text.");
-   lightlogger::log_formatted(lightlogger::LC_FORG_COL_YELLOW, "Formatted text with %s.", "param");
+    lightlogger::log_formatted(lightlogger::LC_LOG_ATTR_UNDERLINE, lightlogger::LC_FORG_COL_YELLOW, "Formatted text.");
+    lightlogger::log_formatted(lightlogger::LC_FORG_COL_YELLOW, "Formatted text with %s.", "param");
 
 #ifndef __ANDROID__
-   test_func();
+    test_func();
 #endif
 
-   // Using streams.
-   {
-      lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE);
-      logger.stream() << "Blue log using stream. " << "Params can be added like " << 1234 << ".";
+    // Using streams.
+    {
+        lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE);
+        logger.stream() << "Blue log using stream. " << "Params can be added like " << 1234 << ".";
 
-      lightlogger::LC_LogDef l(NULL);
-      Q_UNUSED(l);
-   }
+        lightlogger::LC_LogDef l(NULL);
+        Q_UNUSED(l);
+    }
 
-   {
-       lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE, lightlogger::LC_BACK_COL_MAGENTA);
-       logger.stream() << "Blue text on magenta";
-   }
+    {
+        lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE, lightlogger::LC_BACK_COL_MAGENTA);
+        logger.stream() << "Blue text on magenta";
+    }
 
-   {
-       lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE, lightlogger::LC_BACK_BRIGHT_COL_MAGENTA);
-       logger.stream() << "Blue text on bright magenta";
-   }
+    {
+        lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE, lightlogger::LC_BACK_BRIGHT_COL_MAGENTA);
+        logger.stream() << "Blue text on bright magenta";
+    }
 
-   {
-      lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_DEBUG);
-      logger.stream() << "Debug log with stream.";
-   }
+    {
+        lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_DEBUG);
+        logger.stream() << "Debug log with stream.";
+    }
 
-   {
-      lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_WARN);
-      logger.stream() << "Warning log with stream.";
-   }
+    {
+        lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_WARN);
+        logger.stream() << "Warning log with stream.";
+    }
 
-   {
-      lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_CRITICAL);
-      logger.stream() << "Critical log with stream.";
-   }
+    {
+        lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_CRITICAL);
+        logger.stream() << "Critical log with stream.";
+    }
 
-   {
-       lightlogger::lc_font_change(stdout, std::set<lightlogger::LC_LogAttrib> {
-           lightlogger::LC_LOG_ATTR_BLINK,
-           lightlogger::LC_LOG_ATTR_UNDERLINE
-       }, lightlogger::LC_FORG_COL_RED, lightlogger::LC_BACK_COL_YELLOW);
-       fprintf(stdout, "HELLO");
-       lightlogger::lc_font_reset(stdout);
-       fprintf(stdout, "\n");
-   }
+    {
+        lightlogger::lc_font_change(stdout, std::set<lightlogger::LC_LogAttrib> {
+                                                lightlogger::LC_LOG_ATTR_BLINK,
+                                                lightlogger::LC_LOG_ATTR_UNDERLINE
+                                            }, lightlogger::LC_FORG_COL_RED, lightlogger::LC_BACK_COL_YELLOW);
+        fprintf(stdout, "HELLO");
+        lightlogger::lc_font_reset(stdout);
+        fprintf(stdout, "\n");
+    }
 
 #if defined(QT_QML_LIB) && defined(QT_QUICK_LIB)
-   QQuickView view;
-   lightlogger::LC_QMLLogger::registerObject(view.rootContext());
-   view.setSource(QUrl("qrc:///main.qml"));
+    QQuickView view;
+    lightlogger::LC_QMLLogger::registerObject(view.rootContext());
+    view.setSource(QUrl("qrc:///main.qml"));
 #endif
 
-   //assert(log_verbose("") == true);
-   assert(log_info("") == true);
-   assert(log_warn("") == false);
-   assert(log_err("") == false);
-   assert(log_critical("") == false);
+    //assert(log_verbose("") == true);
+    assert(log_info("") == true);
+    assert(log_warn("") == false);
+    assert(log_err("") == false);
+    assert(log_critical("") == false);
 
-   return 0;
+    return 0;
 }
 #endif
