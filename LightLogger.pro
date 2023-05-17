@@ -18,8 +18,10 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-SOURCES  += main.cpp
-HEADERS  += lc_logging.h
+SOURCES  += main.cpp \
+    applogging.cpp
+HEADERS  += lc_logging_qt.h \
+    applogging.h
 
 DEFINES  += BUILD_LOG_LEVEL_INFORMATION ENABLE_CODE_LOCATION
 
@@ -65,7 +67,10 @@ OTHER_FILES += \
     android/res/drawable-hdpi/icon.png \
     android/res/layout/splash.xml \
     android/res/values-el/strings.xml \
-    main.qml
+    main.qml \
+    lc_logging.h \
+    lc_logging_qt.h \
+    lc_logging_utils.h
 
 RESOURCES += \
     resources.qrc

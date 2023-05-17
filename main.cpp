@@ -41,7 +41,7 @@
 #endif
 #endif
 
-#include "lc_logging.h"
+#include "applogging.h"
 
 #ifdef __ANDROID__
 #include <jni.h>
