@@ -88,14 +88,9 @@
 #elif defined(_WIN32) || defined(_WIN32_WCE)
 #include <WinSock2.h>
 #include <Windows.h>
-#if WINVER < 0x0602
-// It seems Windows 8.1 does not support DbgHelp yet.
 #include <DbgHelp.h>
-#else
-// On Windows 8 this seems to be needed to get timing functions.
 #include <datetimeapi.h>
 #endif // WINVER<0x0602
-#endif // !defined(_WIN32) && !defined(_WIN32_WCE) && !defined(NTDDI_WIN8)
 #ifdef __ANDROID__
 #include <android/log.h>
 #else
@@ -951,7 +946,7 @@ inline bool log_disabled(NSString* format, ...)
 #define log_debug_func \
    lightlogger::log_debug("Entering: %s.", __PRETTY_FUNCTION__)
 
-#if !defined(__ANDROID__) && (!defined(WINVER) || WINVER < 0x0602)
+#if !defined(__ANDROID__)
 /* Unfortunately backtrace() is not supported by Bionic */
 
 #if !defined(_WIN32) && !defined(_WIN32_WCE)

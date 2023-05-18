@@ -41,6 +41,7 @@
 #endif
 #endif
 
+#define COLORING_ENABLED
 #include "lc_logging.h"
 lightlogger::custom_log_func lightlogger::global_log_func = log_to_stdout;
 
