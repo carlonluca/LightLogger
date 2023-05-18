@@ -643,32 +643,6 @@ private:
 typedef void (*custom_log_func)(LC_Log&, va_list);
 extern custom_log_func global_log_func;
 
-#ifdef __ANDROID__
-/*------------------------------------------------------------------------------
-|    LC_OutputAndroid class
-+-----------------------------------------------------------------------------*/
-class LC_OutputAndroid
-{
-public:
-   static void printf(LC_Log<LC_OutputAndroid>& logger, va_list args);
-};
-typedef LC_Log<LC_OutputAndroid> LC_LogAndroid;
-#endif // __ANDROID__
-
-#ifdef XCODE_COLORING_ENABLED
-/*------------------------------------------------------------------------------
-|    LC_OutputXCodeColors class
-+-----------------------------------------------------------------------------*/
-class LC_Output2XCodeColors
-{
-public:
-   static void printf(LC_Log<LC_Output2XCodeColors>& logger, va_list args);
-   static bool checkEnv();
-   static NSString* getColorForLevel(LC_LogLevel level);
-};
-typedef LC_Log<LC_Output2XCodeColors> LC_LogXCodeColors;
-#endif
-
 #ifdef ENABLE_LOG_CRITICAL
 GENERATE_LEVEL(critical, LC_LOG_CRITICAL, false)
 GENERATE_LEVEL_OBJC(critical, LC_LOG_CRITICAL, NO)
@@ -1086,7 +1060,7 @@ inline void log_stacktrace(const char* log_tag, unsigned int max_frames)
 #endif // !defined(__ANDROID__) && (!defined(WINVER) || WINVER < 0x0602)
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::LC_Log
+|    LC_Log::LC_Log
 +-----------------------------------------------------------------------------*/
 inline LC_Log::LC_Log(LC_LogColor color, bool nl) :
     m_level(LC_LOG_NONE)
@@ -1099,7 +1073,7 @@ inline LC_Log::LC_Log(LC_LogColor color, bool nl) :
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::LC_Log
+|    LC_Log::LC_Log
 +-----------------------------------------------------------------------------*/
 inline LC_Log::LC_Log(const char* log_tag, LC_LogLevel level, bool nl) :
     m_level(level)
@@ -1110,7 +1084,7 @@ inline LC_Log::LC_Log(const char* log_tag, LC_LogLevel level, bool nl) :
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::LC_Log
+|    LC_Log::LC_Log
 +-----------------------------------------------------------------------------*/
 inline LC_Log::LC_Log(const char *log_tag, bool nl) :
     m_level(LC_LOG_INFO)
@@ -1121,7 +1095,7 @@ inline LC_Log::LC_Log(const char *log_tag, bool nl) :
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::LC_Log
+|    LC_Log::LC_Log
 +-----------------------------------------------------------------------------*/
 inline LC_Log::LC_Log(LC_LogLevel level, bool nl) :
     m_level(level)
@@ -1132,7 +1106,7 @@ inline LC_Log::LC_Log(LC_LogLevel level, bool nl) :
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::LC_Log
+|    LC_Log::LC_Log
 +-----------------------------------------------------------------------------*/
 inline LC_Log::LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor color, bool nl) :
     m_level(LC_LOG_NONE)
@@ -1157,7 +1131,7 @@ inline LC_Log::LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor colo
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::appendHeader
+|    LC_Log::appendHeader
 +-----------------------------------------------------------------------------*/
 inline void LC_Log::prependHeader(std::string& s)
 {
@@ -1167,7 +1141,7 @@ inline void LC_Log::prependHeader(std::string& s)
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::appendlog_tagIfNeeded
+|    LC_Log::appendlog_tagIfNeeded
 +-----------------------------------------------------------------------------*/
 inline void LC_Log::prependLogTagIfNeeded(std::string& s)
 {
@@ -1176,7 +1150,7 @@ inline void LC_Log::prependLogTagIfNeeded(std::string& s)
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::printf
+|    LC_Log::printf
 +-----------------------------------------------------------------------------*/
 inline void LC_Log::printf(const char* format, ...)
 {
@@ -1205,7 +1179,7 @@ inline void LC_Log::printf(const char* format, ...)
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::printf
+|    LC_Log::printf
 +-----------------------------------------------------------------------------*/
 inline void LC_Log::printf(const char* format, va_list args)
 {
@@ -1239,9 +1213,9 @@ inline void LC_Log::printf(const char* format, va_list args)
 
 #if defined(__APPLE__) && (__OBJC__ == 1)
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::printf
+|    LC_Log::printf
 +-----------------------------------------------------------------------------*/
-template <typename T> inline void LC_Log<T>::printf(NSString* format, ...)
+inline void LC_Log::printf(NSString* format, ...)
 {
    if (LC_LIKELY(m_level != LC_LOG_NONE)) {
 #ifdef BUILD_LOG_LEVEL_DEBUG
@@ -1268,9 +1242,9 @@ template <typename T> inline void LC_Log<T>::printf(NSString* format, ...)
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::printf
+|    LC_Log::printf
 +-----------------------------------------------------------------------------*/
-template <typename T> inline void LC_Log<T>::printf(NSString* format, va_list args)
+inline void LC_Log::printf(NSString* format, va_list args)
 {
    if (LC_LIKELY(m_level != LC_LOG_NONE)) {
 #ifdef BUILD_LOG_LEVEL_DEBUG
@@ -1307,7 +1281,7 @@ template <typename T> inline void LC_Log<T>::printf(NSString* format, va_list ar
 #endif // defined(__APPLE__) && (__OBJC__ == 1)
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::~LC_Log
+|    LC_Log::~LC_Log
 +-----------------------------------------------------------------------------*/
 inline LC_Log::~LC_Log()
 {
@@ -1339,7 +1313,7 @@ inline LC_Log::~LC_Log()
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::stream
+|    LC_Log::stream
 +-----------------------------------------------------------------------------*/
 inline std::ostream& LC_Log::stream()
 {
@@ -1370,7 +1344,7 @@ inline std::ostream& LC_Log::stream()
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::toString
+|    LC_Log::toString
 +-----------------------------------------------------------------------------*/
 inline std::string LC_Log::toString(LC_LogLevel level)
 {
@@ -1387,7 +1361,7 @@ inline std::string LC_Log::toString(LC_LogLevel level)
 }
 
 /*------------------------------------------------------------------------------
-|    LC_Log<T>::fromString
+|    LC_Log::fromString
 +-----------------------------------------------------------------------------*/
 inline LC_LogLevel LC_Log::fromString(const std::string& level)
 {
@@ -1405,7 +1379,7 @@ inline LC_LogLevel LC_Log::fromString(const std::string& level)
       return LC_LOG_CRITICAL;
 
    // TODO
-   //LC_Log<T>().prependHeader(LC_LOG_WARN)
+   //LC_Log().prependHeader(LC_LOG_WARN)
    //   << "Unknown logging level '" << level << "'. Using INFO level as default.";
    return LC_LOG_INFO;
 }
@@ -1558,7 +1532,7 @@ inline void log_to_msvs(LC_Log& logger, va_list args)
 /*------------------------------------------------------------------------------
 |    LC_OutputAndroid::printf
 +-----------------------------------------------------------------------------*/
-inline void LC_OutputAndroid::printf(LC_Log<LC_OutputAndroid>& logger, va_list args)
+inline void log_to_logcat(LC_Log& logger, va_list args)
 {
    static const android_LogPriority android_logPriority [] = {
       // Do not mess with the order. Must map the LC_LogLevel enum.
@@ -1583,7 +1557,7 @@ inline void LC_OutputAndroid::printf(LC_Log<LC_OutputAndroid>& logger, va_list a
 /*------------------------------------------------------------------------------
 |    LC_Output2XCodeColors::printf
 +-----------------------------------------------------------------------------*/
-inline void LC_Output2XCodeColors::printf(LC_Log<LC_Output2XCodeColors>& logger, va_list args)
+inline void log_to_xcodecolors(LC_Log& logger, va_list args)
 {
 #define XC_COL_ESC_MAC @"\033["
 #define XC_COL_ESC_IOS @"\xC2\xA0["
@@ -1702,9 +1676,15 @@ inline std::string lc_current_time()
    time_t t;
    time(&t);
 
+#ifdef WIN32
    struct tm timeinfo;
    localtime_s(&timeinfo, &t);
    strftime(buffer, sizeof(buffer), "%T", &timeinfo);
+#else
+   struct tm* timeinfo = localtime(&t);
+   strftime(buffer, sizeof(buffer), "%T", timeinfo);
+#endif
+
 
    struct timeval tv;
    gettimeofday(&tv, 0);
@@ -1830,6 +1810,19 @@ private:
    LC_QMLLogger() : QObject() {}
 };
 #endif // QT_QML_LIB
+
+inline void log_to_default(LC_Log& logger, va_list args)
+{
+#ifdef __ANDROID__
+   log_to_logcat(logger, args);
+#elif defined(XCODE_COLORING_ENABLED)
+   log_to_xcodecolors(logger, args);
+#elif defined(ENABLE_MSVS_OUTPUT)
+   log_to_msvs(logger, args);
+#else
+   log_to_stdout(logger, args);
+#endif
+}
 
 }
 
