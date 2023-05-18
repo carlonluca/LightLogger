@@ -33,10 +33,6 @@
 #define APPLOGGING_H
 
 #include "lc_logging.h"
-#define CUSTOM_LOGGER
-namespace lightlogger {
-typedef LC_Log<LC_Output2Std> LC_LogDef;
-}
 #include "lc_logging_utils.h"
 #include "lc_logging_qt.h"
 

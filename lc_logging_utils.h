@@ -34,19 +34,6 @@
 
 namespace lightlogger {
 
-// Define the default logger.
-#ifndef CUSTOM_LOGGER
-#ifdef __ANDROID__
-typedef LC_Log<LC_OutputAndroid> LC_LogDef;
-#elif defined(XCODE_COLORING_ENABLED)
-typedef LC_Log<LC_Output2XCodeColors> LC_LogDef;
-#elif defined(ENABLE_MSVS_OUTPUT)
-typedef LC_Log<LC_Output2MSVS> LC_LogDef;
-#else
-typedef LC_Log<LC_Output2Std> LC_LogDef;
-#endif
-#endif // CUSTOM_LOGGER
-
 #ifdef ENABLE_CODE_LOCATION
 #define DEF_FUNC(name) f_log_ ##name
 #else
@@ -58,46 +45,46 @@ typedef LC_Log<LC_Output2Std> LC_LogDef;
 #define GENERATE_LEVEL(name, enumname, retval)                                          \
     inline bool DEF_FUNC(name ##_t_v)(const char* log_tag, const char* format, va_list args) \
     {                                                                                    \
-            LC_LogDef(log_tag, enumname).printf(format, args);                                \
+            LC_Log(log_tag, enumname).printf(format, args);                                \
             return retval;                                                                    \
     }                                                                                    \
                                                                                             \
     inline bool DEF_FUNC(name ##_t)(const char* log_tag, const char* format, ...)            \
     {                                                                                    \
-            VA_LIST_CONTEXT(format, LC_LogDef(log_tag, enumname).printf(format, args));       \
+            VA_LIST_CONTEXT(format, LC_Log(log_tag, enumname).printf(format, args));       \
             return retval;                                                                    \
     }                                                                                    \
                                                                                             \
         inline bool DEF_FUNC(name ##_v)(const char* format, va_list args)                        \
     {                                                                                    \
-            LC_LogDef(enumname).printf(format, args);                                         \
+            LC_Log(enumname).printf(format, args);                                         \
             return retval;                                                                    \
     }                                                                                    \
         inline bool DEF_FUNC(name)(const char* format, ...)                                      \
     {                                                                                    \
-            VA_LIST_CONTEXT(format, LC_LogDef(enumname).printf(format, args));                \
+            VA_LIST_CONTEXT(format, LC_Log(enumname).printf(format, args));                \
             return retval;                                                                    \
     }                                                                                    \
         inline bool SHOW(name ##_t_v)(const char* log_tag, const char* format, va_list args) \
     {                                                                                    \
-            LC_LogDef(log_tag, enumname, false).printf(format, args);                         \
+            LC_Log(log_tag, enumname, false).printf(format, args);                         \
             return retval;                                                                    \
     }                                                                                    \
                                                                                             \
         inline bool SHOW(name ##_t)(const char* log_tag, const char* format, ...)            \
     {                                                                                    \
-            VA_LIST_CONTEXT(format, LC_LogDef(log_tag, enumname, false).printf(format, args));\
+            VA_LIST_CONTEXT(format, LC_Log(log_tag, enumname, false).printf(format, args));\
             return retval;                                                                    \
     }                                                                                    \
                                                                                             \
         inline bool SHOW(name ##_v)(const char* format, va_list args)                        \
     {                                                                                    \
-            LC_LogDef(enumname, false).printf(format, args);                                  \
+            LC_Log(enumname, false).printf(format, args);                                  \
             return retval;                                                                    \
     }                                                                                    \
         inline bool SHOW(name)(const char* format, ...)                                      \
     {                                                                                    \
-            VA_LIST_CONTEXT(format, LC_LogDef(enumname, false).printf(format, args));         \
+            VA_LIST_CONTEXT(format, LC_Log(enumname, false).printf(format, args));         \
             return retval;                                                                    \
     }
 
@@ -210,7 +197,7 @@ GENERATE_LEVEL_CUSTOM(warn, bool, return false)
 +-----------------------------------------------------------------------------*/
     inline bool log_formatted_t_v(const char* log_tag, LC_LogAttrib a, LC_LogColor c, const char* format, va_list args)
 {
-    LC_LogDef(log_tag, a, c).printf(format, args);
+    LC_Log(log_tag, a, c).printf(format, args);
     return true;
 }
 
@@ -219,7 +206,7 @@ GENERATE_LEVEL_CUSTOM(warn, bool, return false)
 +-----------------------------------------------------------------------------*/
 inline bool log_formatted_t(const char* log_tag, LC_LogAttrib a, LC_LogColor c, const char* format, ...)
 {
-    VA_LIST_CONTEXT(format, LC_LogDef(log_tag, a, c).printf(format, args));
+    VA_LIST_CONTEXT(format, LC_Log(log_tag, a, c).printf(format, args));
     return true;
 }
 
@@ -228,7 +215,7 @@ inline bool log_formatted_t(const char* log_tag, LC_LogAttrib a, LC_LogColor c, 
 +-----------------------------------------------------------------------------*/
 inline bool log_formatted_v(LC_LogAttrib a, LC_LogColor c, const char* format, va_list args)
 {
-    LC_LogDef(LOG_TAG, a, c).printf(format, args);
+    LC_Log(LOG_TAG, a, c).printf(format, args);
     return true;
 }
 
@@ -237,7 +224,7 @@ inline bool log_formatted_v(LC_LogAttrib a, LC_LogColor c, const char* format, v
 +-----------------------------------------------------------------------------*/
 inline bool log_formatted(LC_LogAttrib a, LC_LogColor c, const char* format, ...)
 {
-    VA_LIST_CONTEXT(format, LC_LogDef(LOG_TAG, a, c).printf(format, args));
+    VA_LIST_CONTEXT(format, LC_Log(LOG_TAG, a, c).printf(format, args));
     return true;
 }
 
@@ -246,7 +233,7 @@ inline bool log_formatted(LC_LogAttrib a, LC_LogColor c, const char* format, ...
 +-----------------------------------------------------------------------------*/
 inline bool log_formatted(LC_LogColor c, const char* format, ...)
 {
-    VA_LIST_CONTEXT(format, LC_LogDef(LOG_TAG, LC_LOG_ATTR_RESET, c).printf(format, args));
+    VA_LIST_CONTEXT(format, LC_Log(LOG_TAG, LC_LOG_ATTR_RESET, c).printf(format, args));
     return true;
 }
 
@@ -430,7 +417,7 @@ inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int 
 
     if (addrlen == 0) {
         stream << "<empty, possibly corrupt>";
-        LC_LogDef(log_tag, level).printf("%s", stream.str().c_str());
+        LC_Log(log_tag, level).printf("%s", stream.str().c_str());
         return;
     }
 
@@ -489,7 +476,7 @@ inline void log_stacktrace(const char* log_tag, LC_LogLevel level, unsigned int 
             stream << "  " << symbollist[i] << std::endl;
     }
 
-    LC_LogDef(log_tag, level).printf("%s", stream.str().c_str());
+    LC_Log(log_tag, level).printf("%s", stream.str().c_str());
 
     free(funcname);
     free(symbollist);
