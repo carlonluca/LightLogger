@@ -643,21 +643,6 @@ private:
 typedef void (*custom_log_func)(LC_Log&, va_list);
 extern custom_log_func global_log_func;
 
-#ifdef ENABLE_MSVS_OUTPUT
-/*------------------------------------------------------------------------------
-|    LC_Output2File class
-+-----------------------------------------------------------------------------*/
-/**
-* Used to send debugging messages to Visual Studio instead of standard output.
-*/
-class LC_Output2MSVS
-{
-public:
-   static void printf(LC_Log<LC_Output2MSVS>& logger, va_list args);
-};
-typedef LC_Log<LC_Output2MSVS> LC_LogMSVC;
-#endif // ENABLE_MSVS_OUTPUT
-
 #ifdef __ANDROID__
 /*------------------------------------------------------------------------------
 |    LC_OutputAndroid class
@@ -1557,7 +1542,7 @@ inline std::string string_format(const std::string fmt_str, va_list ap)
 /*------------------------------------------------------------------------------
 |    LC_Output2MSVS::printf
 +-----------------------------------------------------------------------------*/
-inline void LC_Output2MSVS::printf(LC_Log<LC_Output2MSVS>& logger, va_list args)
+inline void log_to_msvs(LC_Log& logger, va_list args)
 {
    // Prepend.
    std::string final = logger.m_string.str();
@@ -1717,13 +1702,15 @@ inline std::string lc_current_time()
    time_t t;
    time(&t);
 
-   strftime(buffer, sizeof(buffer), "%T", localtime(&t));
+   struct tm timeinfo;
+   localtime_s(&timeinfo, &t);
+   strftime(buffer, sizeof(buffer), "%T", &timeinfo);
 
    struct timeval tv;
    gettimeofday(&tv, 0);
 
    char result[100] = { 0 };
-   std::sprintf(result, "%s.%03ld", buffer, (long) tv.tv_usec / 1000);
+   std::snprintf(result, 100, "%s.%03ld", buffer, (long) tv.tv_usec / 1000);
 
    return result;
 }
