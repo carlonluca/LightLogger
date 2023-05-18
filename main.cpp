@@ -42,6 +42,7 @@
 #endif
 
 #include "lc_logging.h"
+lightlogger::custom_log_func lightlogger::global_log_func = log_to_stdout;
 
 #ifdef __ANDROID__
 #include <jni.h>
@@ -155,37 +156,38 @@ int main(int argc, char** argv)
 
    // Using streams.
    {
-      lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE);
+      lightlogger::LC_Log logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE);
       logger.stream() << "Blue log using stream. " << "Params can be added like " << 1234 << ".";
 
-      lightlogger::LC_LogDef l(NULL);
+      lightlogger::LC_Log l(NULL);
       Q_UNUSED(l);
    }
 
    {
-       lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE, lightlogger::LC_BACK_COL_MAGENTA);
+       lightlogger::LC_Log logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE, lightlogger::LC_BACK_COL_MAGENTA);
        logger.stream() << "Blue text on magenta";
    }
 
    {
-       lightlogger::LC_LogDef logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE, lightlogger::LC_BACK_BRIGHT_COL_MAGENTA);
+       lightlogger::LC_Log logger(NULL, lightlogger::LC_LOG_ATTR_RESET, lightlogger::LC_FORG_COL_BLUE, lightlogger::LC_BACK_BRIGHT_COL_MAGENTA);
        logger.stream() << "Blue text on bright magenta";
    }
 
-   {
-      lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_DEBUG);
-      logger.stream() << "Debug log with stream.";
-   }
+   // TODO
+   //{
+   //   lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_DEBUG);
+   //   logger.stream() << "Debug log with stream.";
+   //}
 
-   {
-      lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_WARN);
-      logger.stream() << "Warning log with stream.";
-   }
+   //{
+   //   lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_WARN);
+   //   logger.stream() << "Warning log with stream.";
+   //}
 
-   {
-      lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_CRITICAL);
-      logger.stream() << "Critical log with stream.";
-   }
+   //{
+   //   lightlogger::LC_Log<lightlogger::LC_Output2Std> logger(lightlogger::LC_LOG_CRITICAL);
+   //   logger.stream() << "Critical log with stream.";
+   //}
 
    {
        lightlogger::lc_font_change(stdout, std::set<lightlogger::LC_LogAttrib> {
