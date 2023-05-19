@@ -290,6 +290,23 @@ enum LC_BackColor {
     LC_BACK_COL_DEFAULT =        40 + LC_DEFAULT
 };
 
+/*------------------------------------------------------------------------------
+|    get_color_for_level
++-----------------------------------------------------------------------------*/
+inline LC_LogColor get_color_for_level(LC_LogLevel level)
+{
+    static const LC_LogColor LC_COLOR_MAP [] = {
+        LC_FORG_COL_RED,
+        LC_FORG_COL_RED,
+        LC_FORG_COL_YELLOW,
+        LC_FORG_COL_GREEN,
+        LC_FORG_COL_WHITE,
+        LC_FORG_COL_BLUE
+    };
+
+    return LC_COLOR_MAP[level];
+}
+
 #ifdef XCODE_COLORING_ENABLED
 /*------------------------------------------------------------------------------
  |    lc_xc_col
@@ -628,12 +645,12 @@ public:
    const char* m_log_tag;
    LC_LogAttrib m_attrib;
    LC_LogColor m_color;
-   LC_BackColor m_foreground;
+   LC_BackColor m_background;
    bool m_nl;
 
 private:
    LC_Log(const LC_Log&);
-   LC_Log& operator =(const LC_Log&) ;
+   LC_Log& operator =(const LC_Log&);
 
    void initForLevel(const LC_LogLevel& level);
 
@@ -1067,6 +1084,7 @@ inline LC_Log::LC_Log(LC_LogColor color, bool nl) :
   , m_log_tag(LOG_TAG)
   , m_attrib(LC_LOG_ATTR_RESET)
   , m_color(color)
+  , m_background(LC_BACK_COL_DEFAULT)
   , m_nl(nl)
 {
    // Do nothing.
@@ -1078,6 +1096,9 @@ inline LC_Log::LC_Log(LC_LogColor color, bool nl) :
 inline LC_Log::LC_Log(const char* log_tag, LC_LogLevel level, bool nl) :
     m_level(level)
   , m_log_tag(log_tag)
+  , m_attrib(LC_LOG_ATTR_RESET)
+  , m_color(get_color_for_level(LC_LOG_INFO))
+  , m_background(LC_BACK_COL_DEFAULT)
   , m_nl(nl)
 {
    // Do nothing.
@@ -1089,9 +1110,12 @@ inline LC_Log::LC_Log(const char* log_tag, LC_LogLevel level, bool nl) :
 inline LC_Log::LC_Log(const char *log_tag, bool nl) :
     m_level(LC_LOG_INFO)
   , m_log_tag(log_tag)
+  , m_attrib(LC_LOG_ATTR_RESET)
+  , m_color(get_color_for_level(LC_LOG_INFO))
+  , m_background(LC_BACK_COL_DEFAULT)
   , m_nl(nl)
 {
-   // Do nothing.
+    // Do nothing.
 }
 
 /*------------------------------------------------------------------------------
@@ -1100,6 +1124,9 @@ inline LC_Log::LC_Log(const char *log_tag, bool nl) :
 inline LC_Log::LC_Log(LC_LogLevel level, bool nl) :
     m_level(level)
   , m_log_tag(LOG_TAG)
+  , m_attrib(LC_LOG_ATTR_RESET)
+  , m_color(get_color_for_level(level))
+  , m_background(LC_BACK_COL_DEFAULT)
   , m_nl(nl)
 {
    // Do nothing.
@@ -1113,7 +1140,7 @@ inline LC_Log::LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor colo
   , m_log_tag(log_tag)
   , m_attrib(attrib)
   , m_color(color)
-  , m_foreground(LC_BACK_COL_DEFAULT)
+    , m_background(LC_BACK_COL_DEFAULT)
   , m_nl(nl)
 {
     // Do nothing.
@@ -1124,7 +1151,7 @@ inline LC_Log::LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor colo
   , m_log_tag(log_tag)
   , m_attrib(attrib)
   , m_color(color)
-  , m_foreground(foreground)
+    , m_background(foreground)
   , m_nl(nl)
 {
     // Do nothing.
@@ -1385,23 +1412,6 @@ inline LC_LogLevel LC_Log::fromString(const std::string& level)
 }
 
 /*------------------------------------------------------------------------------
-|    get_color_for_level
-+-----------------------------------------------------------------------------*/
-inline LC_LogColor get_color_for_level(LC_LogLevel level)
-{
-   static const LC_LogColor LC_COLOR_MAP [] = {
-       LC_FORG_COL_RED,
-       LC_FORG_COL_RED,
-       LC_FORG_COL_YELLOW,
-       LC_FORG_COL_GREEN,
-       LC_FORG_COL_WHITE,
-       LC_FORG_COL_BLUE
-   };
-
-   return LC_COLOR_MAP[level];
-}
-
-/*------------------------------------------------------------------------------
 |    log_to_stdout
 +-----------------------------------------------------------------------------*/
 inline void log_to_stdout(LC_Log& logger, va_list args)
@@ -1409,16 +1419,16 @@ inline void log_to_stdout(LC_Log& logger, va_list args)
 #ifdef COLORING_ENABLED
    LC_LogAttrib attrib;
    LC_LogColor  color;
-   LC_BackColor foreground;
+   LC_BackColor background;
    if (LC_LIKELY(logger.m_level != LC_LOG_NONE)) {
       attrib = LC_LOG_ATTR_RESET;
-      color = get_color_for_level(logger.m_level);
-      foreground = LC_BACK_COL_DEFAULT;
+      color = logger.m_color;
+      background = LC_BACK_COL_DEFAULT;
    }
    else {
       attrib = logger.m_attrib;
       color = logger.m_color;
-      foreground = logger.m_foreground;
+      background = logger.m_background;
    }
 
    std::ostringstream sink;
@@ -1431,7 +1441,7 @@ inline void log_to_stdout(LC_Log& logger, va_list args)
       << "[" << (int) attrib << ";"
       << (int)color << "m";
    sink << (char) 0x1B
-      << "[" << (int)foreground << "m";
+        << "[" << (int)background << "m";
    sink << logger.m_string;
    sink << (char) 0x1B
       << "[" << (int) LC_LOG_ATTR_RESET << "m";
