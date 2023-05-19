@@ -41,6 +41,9 @@
 #endif
 #endif
 
+#include <QElapsedTimer>
+#include <QDateTime>
+
 #define COLORING_ENABLED
 #include "lc_logging.h"
 lightlogger::custom_log_func lightlogger::global_log_func = log_to_stdout;
@@ -211,6 +214,18 @@ int main(int argc, char** argv)
    assert(log_warn("") == false);
    assert(log_err("") == false);
    assert(log_critical("") == false);
+
+   QString dateTime = QDateTime::currentDateTime().toString();
+   QElapsedTimer timer;
+   timer.start();
+   for (int i = 0; i < 1E5; i++) {
+       lightlogger::LC_Log(lightlogger::LC_FORG_COL_MAGENTA)
+           .printf("This is a test log, %s %s: %s",
+                   "testing the performance of the log call.",
+                   "Timestamp",
+                   qPrintable(dateTime));
+   }
+   qInfo() << "Time:" << timer.elapsed();
 
    return 0;
 }

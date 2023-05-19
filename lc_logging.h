@@ -1422,6 +1422,11 @@ inline void log_to_stdout(LC_Log& logger, va_list args)
    }
 
    std::stringstream sink;
+   if (logger.m_log_tag)
+      sink << "[" << logger.m_log_tag << "]: ";
+   if (LC_LIKELY(logger.m_level != LC_LOG_NONE))
+      sink << logger.toString(logger.m_level) << ":\t";
+   sink << lc_current_time() << " ";
    sink << (char) 0x1B
       << "[" << (int) attrib << ";"
       << (int)color << "m";
@@ -1440,10 +1445,6 @@ inline void log_to_stdout(LC_Log& logger, va_list args)
       s << std::endl;
    std::string final = s.str();
 #endif // COLORING_ENABLED
-
-   // Prepend tags.
-   logger.prependHeader(final);
-   logger.prependLogTagIfNeeded(final);
 
    // I prefer to flush to avoid missing buffered logs in case of crash.
    FILE* stdOut = stdout;
