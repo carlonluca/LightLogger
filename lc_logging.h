@@ -1421,7 +1421,7 @@ inline void log_to_stdout(LC_Log& logger, va_list args)
       foreground = logger.m_foreground;
    }
 
-   std::stringstream sink;
+   std::ostringstream sink;
    if (logger.m_log_tag)
       sink << "[" << logger.m_log_tag << "]: ";
    if (LC_LIKELY(logger.m_level != LC_LOG_NONE))
