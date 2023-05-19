@@ -620,7 +620,7 @@ public:
    void prependHeader(std::string& s);
    void prependLogTagIfNeeded(std::string& s);
 
-   std::stringstream m_string;
+   std::string m_string;
 
    // If level is set, then attrib and color are not unless level
    // is none.
@@ -1204,7 +1204,7 @@ inline void LC_Log::printf(const char* format, va_list args)
 #endif
    }
 
-   m_string << format;
+   m_string = format;
 
    // Delegate log handling.
    if (global_log_func)
@@ -1432,7 +1432,7 @@ inline void log_to_stdout(LC_Log& logger, va_list args)
       << (int)color << "m";
    sink << (char) 0x1B
       << "[" << (int)foreground << "m";
-   sink << logger.m_string.str();
+   sink << logger.m_string;
    sink << (char) 0x1B
       << "[" << (int) LC_LOG_ATTR_RESET << "m";
    if (LC_LIKELY(logger.m_nl))
@@ -1479,7 +1479,7 @@ inline FILE*& file_stream()
 inline void log_to_file(LC_Log& logger, va_list args)
 {
    // Prepend.
-   std::string final = logger.m_string.str();
+   std::string final = logger.m_string;
    logger.prependHeader(final);
    logger.prependLogTagIfNeeded(final);
    final.append("\n");
