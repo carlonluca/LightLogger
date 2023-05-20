@@ -1140,7 +1140,7 @@ inline LC_Log::LC_Log(const char* log_tag, LC_LogAttrib attrib, LC_LogColor colo
   , m_log_tag(log_tag)
   , m_attrib(attrib)
   , m_color(color)
-    , m_background(LC_BACK_COL_DEFAULT)
+  , m_background(LC_BACK_COL_DEFAULT)
   , m_nl(nl)
 {
     // Do nothing.
