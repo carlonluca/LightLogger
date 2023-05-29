@@ -1559,7 +1559,7 @@ inline void log_to_logcat(LC_Log& logger, va_list args)
    __android_log_vprint(
       p,
       logger.m_log_tag,
-      logger.m_string.str().c_str(),
+      logger.m_string.c_str(),
       args);
 }
 #endif // __ANDROID__
