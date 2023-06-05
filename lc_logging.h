@@ -1450,7 +1450,7 @@ inline void log_to_stdout(LC_Log& logger, va_list args)
    std::string final = sink.str();
 #else
    std::stringstream s;
-   s << logger.m_string.str();
+   s << logger.m_string;
    if (logger.m_nl)
       s << std::endl;
    std::string final = s.str();
