@@ -1097,7 +1097,7 @@ inline LC_Log::LC_Log(const char* log_tag, LC_LogLevel level, bool nl) :
     m_level(level)
   , m_log_tag(log_tag)
   , m_attrib(LC_LOG_ATTR_RESET)
-  , m_color(get_color_for_level(LC_LOG_INFO))
+  , m_color(get_color_for_level(level))
   , m_background(LC_BACK_COL_DEFAULT)
   , m_nl(nl)
 {
