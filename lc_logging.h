@@ -81,9 +81,11 @@
 #if !defined(_WIN32) && !defined(_WIN32_WCE)
 #include <libgen.h>
 #endif
+#ifdef __linux__
+#include <execinfo.h>
+#endif
 #if !defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__ANDROID__)
 #include <unistd.h>
-#include <execinfo.h>
 #include <cxxabi.h>
 #elif defined(_WIN32) || defined(_WIN32_WCE)
 #include <WinSock2.h>
@@ -922,10 +924,10 @@ inline bool log_disabled(NSString* format, ...)
 #define log_debug_func \
    lightlogger::log_debug("Entering: %s.", __PRETTY_FUNCTION__)
 
-#if !defined(__ANDROID__)
 /* Unfortunately backtrace() is not supported by Bionic */
+#if !defined(__ANDROID__) && (defined(__linux__) || defined(_WIN32) || defined(_WIN32_WCE))
 
-#if !defined(_WIN32) && !defined(_WIN32_WCE)
+#ifdef __linux__
 /*------------------------------------------------------------------------------
 |    log_stacktrace
 +-----------------------------------------------------------------------------*/
