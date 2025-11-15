@@ -1839,6 +1839,7 @@ inline void log_to_default(LC_Log& logger, va_list args)
 
 }
 
+#ifndef LC_LOGGING_DISABLE_THREADING
 // __cplusplus in VS2015 is still terribly old. So check for the damn
 // VS compiler separately.
 #if __cplusplus >= 201103L || _MSC_VER >= 1800
@@ -1849,6 +1850,7 @@ static std::once_flag log_info_once_flag;
 		log_info(__VA_ARGS__); \
 	});
 #endif
+#endif // 
 
 // Prevent from using outside.
 #undef VA_LIST_CONTEXT
