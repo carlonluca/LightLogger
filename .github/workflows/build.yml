@@ -11,6 +11,8 @@ jobs:
     container:
       image: carlonluca/qt-dev:6.12.0-win
     steps:
+      - name: Setup CI
+        run: apt-get update && apt-get install -y nodejs npm
       - uses: actions/checkout@v3
         with:
           submodules: recursive
