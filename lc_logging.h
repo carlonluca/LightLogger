@@ -88,9 +88,9 @@
 #include <unistd.h>
 #include <cxxabi.h>
 #elif defined(_WIN32) || defined(_WIN32_WCE)
-#include <WinSock2.h>
-#include <Windows.h>
-#include <DbgHelp.h>
+#include <winsock2.h>
+#include <windows.h>
+#include <dbghelp.h>
 #include <datetimeapi.h>
 #endif // WINVER<0x0602
 #ifdef __ANDROID__
