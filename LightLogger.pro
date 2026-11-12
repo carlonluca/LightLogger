@@ -24,7 +24,7 @@ HEADERS  += lc_logging.h
 DEFINES  += BUILD_LOG_LEVEL_INFORMATION ENABLE_CODE_LOCATION
 
 windows {
-LIBS     += -lDbghelp
+LIBS     += -ldbghelp
 }
 
 # Necessary to get the symbols when logging the stack trace.
